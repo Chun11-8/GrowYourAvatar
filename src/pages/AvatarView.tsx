@@ -8,6 +8,7 @@ import {
     type AvatarData,
     type MoodState
 } from '../utils/storage';
+import { DUMMY_VOXEL_DOG_CODE } from '../data/dummyVoxelDog';
 
 const AvatarView: React.FC = () => {
     const location = useLocation();
@@ -33,7 +34,8 @@ const AvatarView: React.FC = () => {
         }
 
         if (image && style && !avatar) {
-            handleGenerateVoxel();
+            // handleGenerateVoxel();
+            handleLoadDummy();
         }
     }, [avatarId, image, style]);
 
@@ -68,6 +70,22 @@ const AvatarView: React.FC = () => {
         }
     };
 
+    const handleLoadDummy = () => {
+        const dummyAvatar: AvatarData = {
+            id: 'dummy-dog',
+            image: '',
+            style: 'voxel',
+            voxelCode: DUMMY_VOXEL_DOG_CODE,
+            stats: createInitialStats(),
+            currentMoodState: 'happy',
+            createdAt: Date.now()
+        };
+        setAvatar(dummyAvatar);
+        // We don't save it to storage to avoid polluting persistent state with dummy
+        // But if user wants persistence, we could call saveAvatar(dummyAvatar);
+        // user just wants to test, so ephemeral is fine.
+    };
+
     const handleAction = (action: string) => {
         if (!avatar) return;
 
@@ -80,9 +98,9 @@ const AvatarView: React.FC = () => {
                 newMood = 'happy';
                 break;
             case 'play':
-                // Navigate to Game Hub
-                navigate('/game-hub');
-                return; // Exit early as we are navigating
+                console.log('Navigating to upload-quiz');
+                navigate('/upload-quiz');
+                return;
             case 'rest':
                 newStats.mana = Math.min(5, newStats.mana + 1);
                 newMood = 'sleepy';
@@ -109,13 +127,21 @@ const AvatarView: React.FC = () => {
         }
     };
 
+    const [isNight, setIsNight] = useState(false);
+
+    const toggleDayNight = () => {
+        setIsNight(!isNight);
+    };
+
     if (!avatar && status !== 'generating' && status !== 'error') {
         return (
             <div className="avatar-view-container" style={{ textAlign: 'center', padding: '50px' }}>
                 <div className="clay-container">
                     <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>No Avatar Found</h2>
+                    <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>No Avatar Found</h2>
                     <p style={{ marginBottom: '2rem' }}>You need to create or select an avatar first!</p>
-                    <button className="clay-button" onClick={() => navigate('/select-avatar')}>Go Select One!</button>
+                    {/* Automatically attempting to load dummy now... */}
+                    <button className="clay-button" onClick={handleLoadDummy}>Reload Dummy World</button>
                 </div>
             </div>
         );
@@ -123,24 +149,45 @@ const AvatarView: React.FC = () => {
 
     return (
         <div className="avatar-view-container" style={{ width: '100%', maxWidth: '800px', padding: '10px' }}>
-            <div className="clay-container" style={{ position: 'relative', overflow: 'hidden', paddingTop: '4rem' }}>
+            <div className="clay-container" style={{ position: 'relative', overflow: 'hidden', padding: '1.5rem' }}>
 
-                {/* Back/Home Button */}
-                <button
-                    className="clay-button secondary"
-                    style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', padding: '8px 16px', fontSize: '0.9rem', zIndex: 10 }}
-                    onClick={() => navigate('/select-avatar')}
-                >
-                    ← Friends
-                </button>
+                {/* Header Controls (Flex vs Absolute for mobile) */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '1rem',
+                    zIndex: 10,
+                    position: 'relative'
+                }}>
+                    <button
+                        className="clay-button secondary"
+                        style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                        onClick={() => navigate('/select-avatar')}
+                    >
+                        ← Friends
+                    </button>
+
+                    <button
+                        className="clay-button"
+                        style={{
+                            padding: '8px 12px',
+                            fontSize: '1.2rem',
+                            background: isNight ? '#2c3e50' : '#FFD6A5',
+                            color: isNight ? 'white' : '#333'
+                        }}
+                        onClick={toggleDayNight}
+                    >
+                        {isNight ? '🌙' : '☀️'}
+                    </button>
+                </div>
 
                 {/* Stats Bar */}
                 <div style={{
-                    position: 'absolute',
-                    top: '1.5rem',
-                    right: '1.5rem',
                     display: 'flex',
                     gap: '1rem',
+                    justifyContent: 'center',
+                    marginBottom: '1rem',
                     zIndex: 10
                 }}>
                     <StatBadge label="❤️" value={avatar?.stats.health || 0} />
@@ -152,10 +199,14 @@ const AvatarView: React.FC = () => {
 
                 {/* Main View Area */}
                 <div style={{
-                    margin: '1rem auto',
+                    margin: '0 auto',
                     width: '100%',
-                    height: '500px',
-                    background: 'linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)',
+                    height: 'auto',
+                    aspectRatio: '4/5', // Mobile portrait friendly
+                    maxHeight: '60vh',
+                    background: isNight
+                        ? 'linear-gradient(180deg, #2b5876 0%, #4e4376 100%)'
+                        : 'linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)',
                     borderRadius: '40px',
                     boxShadow: 'var(--clay-shadow-inset)',
                     display: 'flex',
@@ -164,7 +215,8 @@ const AvatarView: React.FC = () => {
                     justifyContent: 'center',
                     position: 'relative',
                     overflow: 'hidden',
-                    border: '8px solid white'
+                    border: '8px solid white',
+                    transition: 'background 0.5s ease'
                 }}>
                     {status === 'generating' && (
                         <div style={{
@@ -228,7 +280,7 @@ const AvatarView: React.FC = () => {
                         left: '50%',
                         transform: 'translateX(-50%)',
                         background: 'rgba(255,255,255,0.8)',
-                        padding: '8px 16px',
+                        padding: '4px 8px',
                         borderRadius: '20px',
                         fontSize: '0.8rem',
                         fontWeight: 700,
@@ -249,7 +301,12 @@ const AvatarView: React.FC = () => {
                     flexWrap: 'wrap'
                 }}>
                     <ActionButton icon="🍎" label="Feed" onClick={() => handleAction('feed')} />
-                    <ActionButton icon="🎮" label="Play" onClick={() => handleAction('play')} />
+
+                    {/* Play Button wrapped in Link for robust navigation */}
+                    <div onClick={() => navigate('/upload-quiz')} style={{ cursor: 'pointer' }}>
+                        <ActionButton icon="🎮" label="Play" onClick={() => { }} />
+                    </div>
+
                     <ActionButton icon="💤" label="Rest" onClick={() => handleAction('rest')} />
                     <ActionButton icon="✨" label="Train" onClick={() => handleAction('train')} />
                 </div>

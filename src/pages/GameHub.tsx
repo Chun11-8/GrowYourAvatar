@@ -37,7 +37,7 @@ const GameHub: React.FC = () => {
                 <button
                     className="clay-button secondary"
                     style={{ padding: '8px 16px', fontSize: '0.9rem', marginBottom: '2rem' }}
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/avatar-view')}
                 >
                     ← Back to Avatar
                 </button>
@@ -49,8 +49,13 @@ const GameHub: React.FC = () => {
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                    gap: '1.5rem'
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', // Auto-fit but wider minmax naturally limits cols
+                    // Or for strict 3 col on large screens:
+                    // gridTemplateColumns: 'repeat(3, 1fr)', 
+                    // But we need mobile responsiveness. Let's use media query style logic or CSS Grid smarts.
+                    // User asked for "3 by 3 view".
+                    gap: '1.5rem',
+                    padding: '1rem'
                 }}>
                     {MINI_GAMES.map((game) => (
                         <div
@@ -59,36 +64,50 @@ const GameHub: React.FC = () => {
                             style={{
                                 cursor: 'pointer',
                                 textAlign: 'center',
-                                background: game.color,
+                                background: `linear-gradient(135deg, ${game.color} 0%, rgba(255,255,255,0.8) 100%)`,
                                 border: '4px solid white',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                 padding: '1.5rem',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                minHeight: '180px'
+                                justifyContent: 'space-between',
+                                minHeight: '200px',
+                                boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                             }}
                             onClick={() => navigate(game.path)}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'scale(1.05) translateY(-5px)';
-                                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'scale(1) translateY(0)';
-                                e.currentTarget.style.boxShadow = 'var(--clay-shadow)';
+                                e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
                             }}
                         >
-                            <div style={{ fontSize: '3.5rem', marginBottom: '0.8rem' }}>{game.emoji}</div>
-                            <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>{game.title}</h3>
+                            <div style={{
+                                fontSize: '4rem',
+                                marginBottom: '1rem',
+                                filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.1))'
+                            }}>{game.emoji}</div>
+
+                            <h3 style={{
+                                fontSize: '1.4rem',
+                                marginBottom: '0.5rem',
+                                color: '#333',
+                                fontWeight: 800
+                            }}>{game.title}</h3>
+
                             <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                 {game.skills.map(skill => (
                                     <span key={skill} style={{
-                                        fontSize: '0.7rem',
-                                        background: 'rgba(255,255,255,0.7)',
-                                        padding: '2px 8px',
-                                        borderRadius: '10px',
-                                        fontWeight: 700
+                                        fontSize: '0.75rem',
+                                        background: 'rgba(255,255,255,0.9)',
+                                        padding: '4px 10px',
+                                        borderRadius: '12px',
+                                        fontWeight: 700,
+                                        color: '#555',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                                     }}>
                                         {skill}
                                     </span>
@@ -98,7 +117,7 @@ const GameHub: React.FC = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

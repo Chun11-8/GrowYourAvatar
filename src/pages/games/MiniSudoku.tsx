@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGameSession } from '../../hooks/useGameSession';
 
 const MiniSudoku: React.FC = () => {
     const navigate = useNavigate();
+    const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
     const [grid, setGrid] = useState<(number | null)[]>([]);
     const [initialIndices, setInitialIndices] = useState<number[]>([]);
 
@@ -28,8 +30,10 @@ const MiniSudoku: React.FC = () => {
     };
 
     useEffect(() => {
-        initGrid();
-    }, []);
+        if (!isGameOver) {
+            initGrid();
+        }
+    }, [isGameOver, round]);
 
     const handleChange = (idx: number) => {
         if (initialIndices.includes(idx)) return;
@@ -42,16 +46,33 @@ const MiniSudoku: React.FC = () => {
         // Check if full and valid (simplified check for this version)
         if (newGrid.every(v => v !== null)) {
             alert('Sudoku Solved! 🧩');
-            initGrid();
+            recordSuccess();
         }
     };
+
+    if (isGameOver) {
+        return (
+            <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="clay-container" style={{ background: '#fff' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Game Over! 🎉</h2>
+                    <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You scored {score} out of {maxRounds}!</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button className="clay-button" onClick={resetGame}>Play Again</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
-                <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ float: 'left' }}>← Back</button>
-                <h2 style={{ fontSize: '2rem', marginTop: '1rem' }}>Mini Sudoku</h2>
-                <div style={{ clear: 'both' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Mini Sudoku</h2>
+                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+                </div>
 
                 <div className="sudoku-grid" style={{
                     display: 'grid',

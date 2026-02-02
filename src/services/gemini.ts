@@ -10,11 +10,12 @@ import { extractHtmlFromText } from "../utils/html";
 let genAI: GoogleGenAI | null = null;
 const getGenAI = (): GoogleGenAI => {
     if (!genAI) {
-        const apiKey = import.meta.env.VITE_API_KEY || "";
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
         if (!apiKey) {
-            throw new Error("Gemini API Key is missing. Please set VITE_API_KEY in your .env file.");
+            throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in your .env file.");
         }
-        genAI = new GoogleGenAI(apiKey);
+        console.log("Initializing Gemini with key:", apiKey ? "Present (Starts with " + apiKey.substring(0, 4) + ")" : "Missing");
+        genAI = new GoogleGenAI({ apiKey: apiKey });
     }
     return genAI;
 };
@@ -81,7 +82,7 @@ export const generateVoxelScene = async (
 
     try {
         const result = await ai.models.generateContentStream({
-            model: "gemini-2.0-flash-thinking-exp",
+            model: "gemini-2.0-flash",
             contents: [
                 {
                     role: "user",

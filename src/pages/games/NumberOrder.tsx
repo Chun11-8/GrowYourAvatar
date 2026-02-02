@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGameSession } from '../../hooks/useGameSession';
 
 const NumberOrder: React.FC = () => {
     const navigate = useNavigate();
+    const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
     const [numbers, setNumbers] = useState<number[]>([]);
     const [targetOrder, setTargetOrder] = useState<number[]>([]);
     const [currentOrder, setCurrentOrder] = useState<number[]>([]);
-    const [score, setScore] = useState(0);
+    // const [score, setScore] = useState(0);
     const [message, setMessage] = useState('Put them in order (1, 2, 3...)');
 
     const generateRound = () => {
@@ -19,8 +21,10 @@ const NumberOrder: React.FC = () => {
     };
 
     useEffect(() => {
-        generateRound();
-    }, []);
+        if (!isGameOver) {
+            generateRound();
+        }
+    }, [isGameOver, round]);
 
     const handleSelect = (num: number) => {
         if (currentOrder.includes(num)) return;
@@ -30,9 +34,8 @@ const NumberOrder: React.FC = () => {
             const newOrder = [...currentOrder, num];
             setCurrentOrder(newOrder);
             if (newOrder.length === targetOrder.length) {
-                setScore(s => s + 1);
                 setMessage('Perfect Order! ✨');
-                setTimeout(generateRound, 1200);
+                recordSuccess();
             } else {
                 setMessage('Next number?');
             }
@@ -42,15 +45,28 @@ const NumberOrder: React.FC = () => {
         }
     };
 
+    if (isGameOver) {
+        return (
+            <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="clay-container" style={{ background: '#fff' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Game Over! 🎉</h2>
+                    <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You scored {score} out of {maxRounds}!</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button className="clay-button" onClick={resetGame}>Play Again</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
-                <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ float: 'left' }}>← Back</button>
-                <h2 style={{ fontSize: '2.5rem', marginTop: '1rem' }}>Number Order</h2>
-                <div style={{ clear: 'both' }}></div>
-
-                <div className="score-board" style={{ fontSize: '1.5rem', margin: '1rem 0', fontWeight: 700 }}>
-                    Score: {score}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Number Order</h2>
+                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
                 </div>
 
                 <div className="current-line" style={{

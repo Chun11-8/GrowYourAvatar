@@ -4,6 +4,8 @@ import CreateAvatar from './pages/CreateAvatar';
 import AvatarView from './pages/AvatarView';
 import SelectAvatar from './pages/SelectAvatar';
 import GameHub from './pages/GameHub';
+import UploadQuiz from './pages/UploadQuiz';
+import ManualQuizInput from './pages/ManualQuizInput';
 
 // Game Imports
 import ShapeMatching from './pages/games/ShapeMatching';
@@ -32,6 +34,8 @@ function App() {
         <Route path="/select-avatar" element={<SelectAvatar />} />
         <Route path="/create-avatar" element={<CreateAvatar />} />
         <Route path="/avatar-view" element={<AvatarView />} />
+        <Route path="/upload-quiz" element={<UploadQuiz />} />
+        <Route path="/manual-quiz" element={<ManualQuizInput />} />
         <Route path="/game-hub" element={<GameHub />} />
 
         {/* Game Routes */}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGameSession } from '../../hooks/useGameSession';
 
 const TicTacToe: React.FC = () => {
     const navigate = useNavigate();
+    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, resetGame } = useGameSession(5);
     const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
     const [isXNext, setIsXNext] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
@@ -23,14 +25,23 @@ const TicTacToe: React.FC = () => {
     };
 
     const handleClick = (i: number) => {
-        if (winner || board[i]) return;
+        if (winner || board[i] || isGameOver) return;
         const newBoard = [...board];
         newBoard[i] = 'X';
         setBoard(newBoard);
         setIsXNext(false);
         const win = checkWinner(newBoard);
-        if (win) setWinner(win);
-        else if (newBoard.every(s => s !== null)) setWinner('Draw');
+        if (win) {
+            setWinner(win);
+            if (win === 'X') {
+                recordSuccess();
+            } else {
+                recordFailure();
+            }
+        } else if (newBoard.every(s => s !== null)) {
+            setWinner('Draw');
+            recordFailure();
+        }
     };
 
     useEffect(() => {
@@ -44,7 +55,13 @@ const TicTacToe: React.FC = () => {
                     setBoard(newBoard);
                     setIsXNext(true);
                     const win = checkWinner(newBoard);
-                    if (win) setWinner(win);
+                    if (win) {
+                        setWinner(win);
+                        recordFailure();
+                    } else if (newBoard.every(s => s !== null)) {
+                        setWinner('Draw');
+                        recordFailure();
+                    }
                 }
             }, 600);
             return () => clearTimeout(timer);
@@ -57,12 +74,34 @@ const TicTacToe: React.FC = () => {
         setWinner(null);
     };
 
+    const handleReset = () => {
+        resetGame();
+        reset();
+    };
+
+    if (isGameOver) {
+        return (
+            <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="clay-container" style={{ background: '#fff' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Game Over! 🎉</h2>
+                    <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You scored {score} out of {maxRounds}!</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button className="clay-button" onClick={handleReset}>Play Again</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
-                <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ float: 'left' }}>← Back</button>
-                <h2 style={{ fontSize: '2.5rem', marginTop: '1rem' }}>Tic-Tac-Toe</h2>
-                <div style={{ clear: 'both' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Tic-Tac-Toe</h2>
+                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+                </div>
 
                 <div style={{ margin: '1rem', fontSize: '1.5rem', fontWeight: 700 }}>
                     {winner ? (winner === 'Draw' ? "It's a Tie! 🤝" : `${winner === 'X' ? 'You' : 'Computer'} Wins! 🏆`) : `Player turn: ${isXNext ? 'X' : 'O'}`}
@@ -94,7 +133,7 @@ const TicTacToe: React.FC = () => {
                         </button>
                     ))}
                 </div>
-                {winner && <button className="clay-button" onClick={reset}>Play Again</button>}
+                {winner && <button className="clay-button" onClick={reset}>Next Round</button>}
             </div>
         </div>
     );

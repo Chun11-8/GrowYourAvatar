@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGameSession } from '../../hooks/useGameSession';
 
 const COLS = 5;
 const ROWS = 4;
 
 const ConnectThree: React.FC = () => {
     const navigate = useNavigate();
+    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, resetGame } = useGameSession(5);
     const [board, setBoard] = useState<(string | null)[][]>(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
     const [isRedNext, setIsRedNext] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
@@ -30,7 +32,7 @@ const ConnectThree: React.FC = () => {
     };
 
     const drop = (c: number) => {
-        if (winner) return;
+        if (winner || isGameOver) return;
         const newBoard = board.map(row => [...row]);
         for (let r = ROWS - 1; r >= 0; r--) {
             if (!newBoard[r][c]) {
@@ -38,18 +40,56 @@ const ConnectThree: React.FC = () => {
                 setBoard(newBoard);
                 setIsRedNext(!isRedNext);
                 const win = checkWin(newBoard);
-                if (win) setWinner(win);
+                if (win) {
+                    setWinner(win);
+                    if (win === '🔴') {
+                        recordSuccess();
+                    } else {
+                        recordFailure();
+                    }
+                }
                 break;
             }
         }
     };
 
+    const handleNextRound = () => {
+        setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
+        setWinner(null);
+        setIsRedNext(true);
+    };
+
+    const handleReset = () => {
+        resetGame();
+        setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
+        setWinner(null);
+        setIsRedNext(true);
+    };
+
+
+    if (isGameOver) {
+        return (
+            <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="clay-container" style={{ background: '#fff' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Game Over! 🎉</h2>
+                    <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You scored {score} out of {maxRounds}!</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button className="clay-button" onClick={handleReset}>Play Again</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
-                <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ float: 'left' }}>← Back</button>
-                <h2 style={{ fontSize: '2rem', marginTop: '1rem' }}>Connect-3</h2>
-                <div style={{ clear: 'both' }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Connect-3</h2>
+                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+                </div>
 
                 <div style={{ margin: '1rem', fontSize: '1.2rem', fontWeight: 700 }}>
                     {winner ? `Winner: ${winner}! 🎉` : `Turn: ${isRedNext ? '🔴' : '🟡'}`}
@@ -84,7 +124,7 @@ const ConnectThree: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                {winner && <button className="clay-button" onClick={() => { setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null))); setWinner(null); }}>Play Again</button>}
+                {winner && <button className="clay-button" onClick={handleNextRound}>Next Round</button>}
             </div>
         </div>
     );

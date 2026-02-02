@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGameSession } from '../../hooks/useGameSession';
 
 const COLORS = ['#FFADAD', '#A0C4FF', '#CAFFBF', '#FDFFB6'];
 
 const SimonSays: React.FC = () => {
     const navigate = useNavigate();
+    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, resetGame } = useGameSession(5);
     const [sequence, setSequence] = useState<number[]>([]);
     const [userIdx, setUserIdx] = useState(0);
     const [activeColor, setActiveColor] = useState<number | null>(null);
     const [isShowing, setIsShowing] = useState(false);
-    const [score, setScore] = useState(0);
+    // const [score, setScore] = useState(0);
 
     const nextRound = () => {
         const next = Math.floor(Math.random() * 4);
@@ -40,7 +42,7 @@ const SimonSays: React.FC = () => {
 
         if (idx === sequence[userIdx]) {
             if (userIdx + 1 === sequence.length) {
-                setScore(s => s + 1);
+                recordSuccess();
                 setTimeout(nextRound, 1000);
             } else {
                 setUserIdx(userIdx + 1);
@@ -48,20 +50,34 @@ const SimonSays: React.FC = () => {
         } else {
             alert('Game Over! Try again! ❤️');
             setSequence([]);
-            setScore(0);
+            // setScore(0);
             setTimeout(nextRound, 1000);
+            recordFailure();
         }
     };
+
+    if (isGameOver) {
+        return (
+            <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="clay-container" style={{ background: '#fff' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Game Over! 🎉</h2>
+                    <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You completed {score} sequences!</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button className="clay-button" onClick={() => { resetGame(); setSequence([]); }}>Play Again</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
-                <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ float: 'left' }}>← Back</button>
-                <h2 style={{ fontSize: '2.5rem', marginTop: '1rem' }}>Simon Says</h2>
-                <div style={{ clear: 'both' }}></div>
-
-                <div className="score-board" style={{ fontSize: '1.5rem', margin: '1rem 0', fontWeight: 700 }}>
-                    Steps: {score}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Simon Says</h2>
+                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
                 </div>
 
                 <div className="simon-grid" style={{
