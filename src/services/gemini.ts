@@ -8,6 +8,7 @@ import { extractHtmlFromText } from "../utils/html";
 
 // Lazy initialization helper
 let genAI: GoogleGenAI | null = null;
+
 const getGenAI = (): GoogleGenAI => {
     if (!genAI) {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
@@ -25,19 +26,41 @@ const ai = {
     get models() {
         return getGenAI().models;
     },
-    generateContent: (args: any) => getGenAI().generateContent(args),
-    generateContentStream: (args: any) => getGenAI().generateContentStream(args)
+    generateContent: (args: any) => getGenAI().models.generateContent(args),
+    generateContentStream: (args: any) => getGenAI().models.generateContentStream(args)
 };
 
 export const IMAGE_SYSTEM_PROMPT = "Generate an isolated object/scene on a simple background.";
-export const VOXEL_PROMPT = "I have provided an image. Code a beautiful voxel art scene inspired by this image using Three.js as a single-page HTML. \n" +
-    "CRITICAL: The avatar must be interactive and cute (Pet Society style). \n" +
-    "1. Add Raycaster to detect clicks: \n" +
-    "   - Clicking the head: 'Pat' reaction (slight jump or heart particles). \n" +
-    "   - Clicking the body: 'Tickle' reaction (wobble or giggle animation). \n" +
-    "2. Support Mood States: The code should listen for messages from the parent window to change moods ('happy', 'sad', 'excited', 'sleepy'). Each mood should have a distinct animation or visual cue. \n" +
-    "3. Use a soft, clay-like lighting and material. \n" +
-    "4. Ensure it's responsive and centered.";
+// export const VOXEL_PROMPT = "I have provided an image. Code a beautiful voxel art scene inspired by this image using Three.js as a single-page HTML. \n" +
+//     "CRITICAL: The avatar must be interactive and cute (Pet Society style). \n" +
+//     "1. Add Raycaster to detect clicks: \n" +
+//     "   - Clicking the head: 'Pat' reaction (slight jump or heart particles). \n" +
+//     "   - Clicking the body: 'Tickle' reaction (wobble or giggle animation). \n" +
+//     "2. Support Mood States: The code should listen for messages from the parent window to change moods ('happy', 'sad', 'excited', 'sleepy'). Each mood should have a distinct animation or visual cue. \n" +
+//     "3. Use a soft, clay-like lighting and material. \n" +
+//     "4. Ensure it's responsive and centered.";
+export const VOXEL_PROMPT = `
+I have provided an image. Write a COMPLETE, single-file HTML code to render a **SIMPLE 3D Voxel Character** based on it.
+
+CRITICAL "NO-ERROR" INSTRUCTIONS:
+1. **NO MODULES:** Do NOT use \`import * as THREE\`. Do NOT use \`type="module"\`.
+2. **USE GLOBALS:** Load Three.js using exactly this script tag in the <head>:
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+3. **SIMPLE GEOMETRY ONLY:**
+   - Do NOT use complex math or noise functions.
+   - Build the character using ONLY \`new THREE.BoxGeometry()\`.
+   - Create a simple 'Head' box and a 'Body' box.
+4. **SAFETY CHECK:**
+   - Wrap your code in \`window.onload = function() { ... }\` to ensure Three.js is loaded.
+   - Inside the loop, check \`if (head) head.rotation.y += 0.01;\` to avoid "undefined" errors.
+5. **INTERACTIVITY:**
+   - Setup a standard \`THREE.Raycaster\`.
+   - On click: make the character spin or jump slightly.
+
+OUTPUT FORMAT:
+- Return ONLY the raw HTML string starting with <!DOCTYPE html>.
+- Do not use markdown blocks.
+`;
 
 export const generateImage = async (prompt: string, aspectRatio: string = '1:1', optimize: boolean = true): Promise<string> => {
     try {
@@ -48,7 +71,7 @@ export const generateImage = async (prompt: string, aspectRatio: string = '1:1',
         }
 
         const result = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
             config: {
                 responseMimeType: "image/png",
@@ -82,7 +105,7 @@ export const generateVoxelScene = async (
 
     try {
         const result = await ai.models.generateContentStream({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: [
                 {
                     role: "user",

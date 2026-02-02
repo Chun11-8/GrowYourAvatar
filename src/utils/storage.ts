@@ -9,7 +9,7 @@ export type MoodState = 'happy' | 'sad' | 'excited' | 'sleepy';
 export interface AvatarData {
     id: string;
     image: string;
-    style: string;
+    style: string; 
     voxelCode?: string;
     stats: AvatarStats;
     currentMoodState: MoodState;

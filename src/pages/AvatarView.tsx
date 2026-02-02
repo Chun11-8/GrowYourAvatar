@@ -34,8 +34,8 @@ const AvatarView: React.FC = () => {
         }
 
         if (image && style && !avatar) {
-            // handleGenerateVoxel();
-            handleLoadDummy();
+            handleGenerateVoxel();
+            //handleLoadDummy();
         }
     }, [avatarId, image, style]);
 
