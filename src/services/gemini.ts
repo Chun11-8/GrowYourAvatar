@@ -1,10 +1,5 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
-*/
-
 import { GoogleGenAI } from "@google/genai";
-import { extractHtmlFromText } from "../utils/html";
+import { VOXEL_TEMPLATE } from "../data/voxelTemplate";
 
 // Lazy initialization helper
 let genAI: GoogleGenAI | null = null;
@@ -31,35 +26,43 @@ const ai = {
 };
 
 export const IMAGE_SYSTEM_PROMPT = "Generate an isolated object/scene on a simple background.";
-// export const VOXEL_PROMPT = "I have provided an image. Code a beautiful voxel art scene inspired by this image using Three.js as a single-page HTML. \n" +
-//     "CRITICAL: The avatar must be interactive and cute (Pet Society style). \n" +
-//     "1. Add Raycaster to detect clicks: \n" +
-//     "   - Clicking the head: 'Pat' reaction (slight jump or heart particles). \n" +
-//     "   - Clicking the body: 'Tickle' reaction (wobble or giggle animation). \n" +
-//     "2. Support Mood States: The code should listen for messages from the parent window to change moods ('happy', 'sad', 'excited', 'sleepy'). Each mood should have a distinct animation or visual cue. \n" +
-//     "3. Use a soft, clay-like lighting and material. \n" +
-//     "4. Ensure it's responsive and centered.";
+
 export const VOXEL_PROMPT = `
-I have provided an image. Write a COMPLETE, single-file HTML code to render a **SIMPLE 3D Voxel Character** based on it.
+I have provided an image. Write the JavaScript code to build a **Voxel Character** using the provided helper function.
 
-CRITICAL "NO-ERROR" INSTRUCTIONS:
-1. **NO MODULES:** Do NOT use \`import * as THREE\`. Do NOT use \`type="module"\`.
-2. **USE GLOBALS:** Load Three.js using exactly this script tag in the <head>:
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-3. **SIMPLE GEOMETRY ONLY:**
-   - Do NOT use complex math or noise functions.
-   - Build the character using ONLY \`new THREE.BoxGeometry()\`.
-   - Create a simple 'Head' box and a 'Body' box.
-4. **SAFETY CHECK:**
-   - Wrap your code in \`window.onload = function() { ... }\` to ensure Three.js is loaded.
-   - Inside the loop, check \`if (head) head.rotation.y += 0.01;\` to avoid "undefined" errors.
-5. **INTERACTIVITY:**
-   - Setup a standard \`THREE.Raycaster\`.
-   - On click: make the character spin or jump slightly.
+### Context
+You are writing code inside this function:
+\`\`\`javascript
+function buildCharacter(createVoxel, rig) {
+  // YOUR CODE HERE
+}
+\`\`\`
 
-OUTPUT FORMAT:
-- Return ONLY the raw HTML string starting with <!DOCTYPE html>.
-- Do not use markdown blocks.
+### API Definition
+1. **createVoxel(color, x, y, z, scaleX, scaleY, scaleZ, parent)**
+   - \`color\`: Hex color (e.g. 0xff0000)
+   - \`x, y, z\`: Position relative to parent
+   - \`scaleX, y, z\`: Scale dimensions
+   - \`parent\`: Three.js Group to attach to.
+
+2. **rig Object (The Skeleton)**
+   - \`rig.head\`: Attach head voxels here.
+   - \`rig.body\`: Attach torso/body voxels here.
+   - \`rig.leftArm\`, \`rig.rightArm\`: Attach arms.
+   - \`rig.leftLeg\`, \`rig.rightLeg\`: Attach legs.
+   - \`rig.tail\`: Attach tail (optional).
+   - \`rig.mouth\`: A hidden point for feeding animations. Set its position relative to the head.
+
+### Instructions
+1. **Analyze** the image to determine colors and shapes.
+2. **Build** the character by calling \`createVoxel\` and attaching parts to the correct \`rig\` group.
+3. **Mouth Alignment:** IMPORTANT! You MUST set \`rig.mouth.position.set(x, y, z)\` to where the mouth should be (relative to \`rig.head\`).
+4. **Style:** Cute, blocky, voxel art style.
+
+### Output Format
+- Return **ONLY** the JavaScript code to go inside the function.
+- Do NOT wrap in \`function buildCharacter() { ... }\`.
+- Do NOT use markdown code blocks.
 `;
 
 export const generateImage = async (prompt: string, aspectRatio: string = '1:1', optimize: boolean = true): Promise<string> => {
@@ -101,7 +104,7 @@ export const generateVoxelScene = async (
     const mimeMatch = imageBase64.match(/^data:(.*?);base64,/);
     const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
 
-    let fullHtml = "";
+    let generatedCode = "";
 
     try {
         const result = await ai.models.generateContentStream({
@@ -126,9 +129,10 @@ export const generateVoxelScene = async (
 
         for await (const chunk of (result as any)) {
             const text = (chunk as any).text || "";
-            fullHtml += text;
+            generatedCode += text;
 
             if (onThoughtUpdate) {
+                // Heuristic to show progress/thought if the model starts explaining (though we asked for code only)
                 const matches = text.match(/\*\*([^*]+)\*\*/g);
                 if (matches) {
                     onThoughtUpdate(matches[matches.length - 1].replace(/\*\*/g, ''));
@@ -136,7 +140,13 @@ export const generateVoxelScene = async (
             }
         }
 
-        return extractHtmlFromText(fullHtml);
+        // Clean up code block markers if present
+        let cleanCode = generatedCode.replace(/```javascript/g, '').replace(/```/g, '').trim();
+
+        // Inject into template
+        const finalHtml = VOXEL_TEMPLATE.replace('/*__GEMINI_CHARACTER_CODE__*/', cleanCode);
+
+        return finalHtml;
 
     } catch (error) {
         console.error("Voxel scene generation failed:", error);
