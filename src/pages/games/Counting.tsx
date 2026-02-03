@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 import congratulations from '../../assets/congratulations.png';
 
@@ -7,6 +7,8 @@ const EMOJIS = ['🍎', '🐶', '🦄', '🌈', '🍦', '🧸', '🐝', '🏀'];
 
 const Counting: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
     const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
 
     const [count, setCount] = useState(3);
@@ -63,7 +65,7 @@ const Counting: React.FC = () => {
                     zIndex: 1000,
                     cursor: 'pointer'
                 }}
-                onClick={() => navigate('/avatar-view')}
+                onClick={() => navigate('/avatar-view', { state: { avatarId } })}
             >
                 <div className="clay-container" style={{
                     background: '#fff',

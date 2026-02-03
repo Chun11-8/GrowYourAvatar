@@ -1,8 +1,9 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const UploadQuiz: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
 
     const options = [
         {
@@ -29,14 +30,15 @@ const UploadQuiz: React.FC = () => {
     ];
 
     const handleChoice = (id: string) => {
+        const state = { avatarId };
         if (id === 'manual') {
-            navigate('/manual-quiz');
+            navigate('/manual-quiz', { state });
         } else if (id === 'camera') {
-            navigate('/quiz-upload');
+            navigate('/quiz-upload', { state });
         } else if (id === 'ai') {
-            navigate('/quiz-generation');
+            navigate('/quiz-generation', { state });
         } else {
-            navigate('/game-hub');
+            navigate('/game-hub', { state });
         }
     };
 
@@ -45,7 +47,7 @@ const UploadQuiz: React.FC = () => {
             <div className="clay-container" style={{ position: 'relative', background: '#f8f9fa' }}>
                 <button
                     className="clay-button secondary"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/avatar-view', { state: { avatarId } })}
                     style={{ position: 'absolute', top: '20px', left: '20px' }}
                 >
                     ← Back

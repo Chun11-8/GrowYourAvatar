@@ -31,10 +31,22 @@ const AvatarView: React.FC = () => {
 
     // Load or Generate Avatar
     useEffect(() => {
-        if (avatarId) {
-            const saved = getAvatarById(avatarId);
+        let targetId = avatarId;
+
+        // Fallback to local storage if no ID in state
+        if (!targetId) {
+            const lastId = localStorage.getItem('lastActiveAvatarId');
+            if (lastId) {
+                targetId = lastId;
+            }
+        }
+
+        if (targetId) {
+            const saved = getAvatarById(targetId);
             if (saved) {
                 setAvatar(saved);
+                // Refresh the active ID
+                localStorage.setItem('lastActiveAvatarId', saved.id);
                 return;
             }
         }
@@ -68,6 +80,7 @@ const AvatarView: React.FC = () => {
 
             setAvatar(newAvatar);
             saveAvatar(newAvatar);
+            localStorage.setItem('lastActiveAvatarId', newAvatar.id);
             setStatus('idle');
             setThinkingText(null);
         } catch (err: any) {
@@ -107,7 +120,7 @@ const AvatarView: React.FC = () => {
                 break;
             case 'play':
                 console.log('Navigating to upload-quiz');
-                navigate('/upload-quiz');
+                navigate('/upload-quiz', { state: { avatarId: avatar.id } });
                 return;
             case 'rest':
                 newStats.mana = Math.min(5, newStats.mana + 1);
@@ -339,8 +352,7 @@ const AvatarView: React.FC = () => {
                 }}>
                     <ActionButton icon="🍎" label="Feed" onClick={() => handleAction('feed')} />
 
-                    {/* Play Button wrapped in Link for robust navigation */}
-                    <div onClick={() => navigate('/upload-quiz')} style={{ cursor: 'pointer' }}>
+                    <div onClick={() => navigate('/upload-quiz', { state: { avatarId: avatar?.id } })} style={{ cursor: 'pointer' }}>
                         <ActionButton icon="🎮" label="Play" onClick={() => { }} />
                     </div>
 

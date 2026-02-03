@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 
 const COLORS = ['#FFADAD', '#A0C4FF', '#CAFFBF', '#FDFFB6'];
 
 const SimonSays: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
     const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, resetGame } = useGameSession(5);
     const [sequence, setSequence] = useState<number[]>([]);
     const [userIdx, setUserIdx] = useState(0);
@@ -64,7 +66,7 @@ const SimonSays: React.FC = () => {
                     <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You completed {score} sequences!</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <button className="clay-button" onClick={() => { resetGame(); setSequence([]); }}>Play Again</button>
-                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}>Back to Hub</button>
                     </div>
                 </div>
             </div>
@@ -75,7 +77,7 @@ const SimonSays: React.FC = () => {
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
                     <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Simon Says</h2>
                     <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
                 </div>

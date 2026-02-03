@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export interface GameInfo {
     id: string;
@@ -102,6 +102,8 @@ const ProgressBar = () => {
 
 const GameHub: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
 
     return (
         <div className="game-hub-container" style={{ width: '100%', maxWidth: '1000px', padding: '20px' }}>
@@ -109,7 +111,7 @@ const GameHub: React.FC = () => {
                 <button
                     className="clay-button secondary"
                     style={{ padding: '8px 16px', fontSize: '0.9rem', marginBottom: '2rem' }}
-                    onClick={() => navigate('/avatar-view')}
+                    onClick={() => navigate('/avatar-view', { state: { avatarId } })}
                 >
                     ← Back to Avatar
                 </button>
@@ -145,7 +147,7 @@ const GameHub: React.FC = () => {
                                 minHeight: '140px',
                                 boxShadow: '0 5px 10px rgba(0,0,0,0.1)'
                             }}
-                            onClick={() => navigate(game.path)}
+                            onClick={() => navigate(game.path, { state: { avatarId } })}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'scale(1.05) translateY(-5px)';
                                 e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)';

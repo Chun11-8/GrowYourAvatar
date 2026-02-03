@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 
 const NumberOrder: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
     const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
     const [numbers, setNumbers] = useState<number[]>([]);
     const [targetOrder, setTargetOrder] = useState<number[]>([]);
@@ -53,7 +55,7 @@ const NumberOrder: React.FC = () => {
                     <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You scored {score} out of {maxRounds}!</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <button className="clay-button" onClick={resetGame}>Play Again</button>
-                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}>Back to Hub</button>
                     </div>
                 </div>
             </div>
@@ -64,7 +66,7 @@ const NumberOrder: React.FC = () => {
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
                     <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Number Order</h2>
                     <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
                 </div>

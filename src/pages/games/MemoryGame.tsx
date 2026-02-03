@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 
 const EMOJIS = ['🍎', '🐶', '🍕', '🚗', '🎈']; // 5 pairs for 5 rounds
@@ -13,6 +13,8 @@ interface Card {
 
 const MemoryGame: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { avatarId } = (location.state as { avatarId?: string }) || {};
     const { score, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5); // 5 Pairs = 5 Points = Game Over
     const [cards, setCards] = useState<Card[]>([]);
     const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
@@ -81,7 +83,7 @@ const MemoryGame: React.FC = () => {
                     <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>You found all {score} pairs!</p>
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                         <button className="clay-button" onClick={() => { resetGame(); initGame(); }}>Play Again</button>
-                        <button className="clay-button secondary" onClick={() => navigate('/game-hub')}>Back to Hub</button>
+                        <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}>Back to Hub</button>
                     </div>
                 </div>
             </div>
@@ -92,7 +94,7 @@ const MemoryGame: React.FC = () => {
         <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
             <div className="clay-container" style={{ background: '#fff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
                     <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Memory Match</h2>
                     <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Pairs {score}/{maxRounds}</div>
                 </div>
