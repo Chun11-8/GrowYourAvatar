@@ -7,8 +7,8 @@ const UploadQuiz: React.FC = () => {
     const options = [
         {
             id: 'camera',
-            title: 'Photo or Gallery',
-            desc: 'Snap a picture or pick from your gallery',
+            title: 'Photo or Upload',
+            desc: 'Upload from your gallery or by document',
             icon: '📸',
             color: '#FFADAD'
         },
@@ -31,6 +31,10 @@ const UploadQuiz: React.FC = () => {
     const handleChoice = (id: string) => {
         if (id === 'manual') {
             navigate('/manual-quiz');
+        } else if (id === 'camera') {
+            navigate('/quiz-upload');
+        } else if (id === 'ai') {
+            navigate('/quiz-generation');
         } else {
             navigate('/game-hub');
         }

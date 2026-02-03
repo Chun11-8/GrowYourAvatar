@@ -9,6 +9,10 @@ import {
     type MoodState
 } from '../utils/storage';
 import { DUMMY_VOXEL_DOG_CODE } from '../data/dummyVoxelDog';
+import springBg from '../assets/backgrounds/background_spring.png';
+import summerBg from '../assets/backgrounds/background_summer.png';
+import autumnBg from '../assets/backgrounds/background_autumn.png';
+import winterBg from '../assets/backgrounds/background_winter.png';
 
 const AvatarView: React.FC = () => {
     const location = useLocation();
@@ -127,10 +131,41 @@ const AvatarView: React.FC = () => {
         }
     };
 
-    const [isNight, setIsNight] = useState(false);
 
-    const toggleDayNight = () => {
-        setIsNight(!isNight);
+    const [season, setSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter'>('spring');
+
+    const toggleSeason = () => {
+        setSeason(prev => {
+            if (prev === 'spring') return 'summer';
+            if (prev === 'summer') return 'autumn';
+            if (prev === 'autumn') return 'winter';
+            return 'spring';
+        });
+    };
+
+    const getSeasonIcon = () => {
+        switch (season) {
+            case 'spring': return '🌸';
+            case 'summer': return '☀️';
+            case 'autumn': return '🍂';
+            case 'winter': return '❄️';
+        }
+    };
+
+    const getBackgroundStyle = () => {
+        let bgImage;
+        switch (season) {
+            case 'spring': bgImage = springBg; break;
+            case 'summer': bgImage = summerBg; break;
+            case 'autumn': bgImage = autumnBg; break;
+            case 'winter': bgImage = winterBg; break;
+        }
+        return {
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        };
     };
 
     if (!avatar && status !== 'generating' && status !== 'error') {
@@ -173,12 +208,12 @@ const AvatarView: React.FC = () => {
                         style={{
                             padding: '8px 12px',
                             fontSize: '1.2rem',
-                            background: isNight ? '#2c3e50' : '#FFD6A5',
-                            color: isNight ? 'white' : '#333'
+                            background: 'rgba(255, 255, 255, 0.8)',
+                            minWidth: '50px'
                         }}
-                        onClick={toggleDayNight}
+                        onClick={toggleSeason}
                     >
-                        {isNight ? '🌙' : '☀️'}
+                        {getSeasonIcon()}
                     </button>
                 </div>
 
@@ -204,9 +239,7 @@ const AvatarView: React.FC = () => {
                     height: 'auto',
                     aspectRatio: '4/5', // Mobile portrait friendly
                     maxHeight: '60vh',
-                    background: isNight
-                        ? 'linear-gradient(180deg, #2b5876 0%, #4e4376 100%)'
-                        : 'linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)',
+                    ...getBackgroundStyle(),
                     borderRadius: '40px',
                     boxShadow: 'var(--clay-shadow-inset)',
                     display: 'flex',

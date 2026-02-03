@@ -28,6 +28,78 @@ export const MINI_GAMES: GameInfo[] = [
     { id: 'simon', title: 'Simon Says', emoji: '🚥', skills: ['Memory', 'Attention'], path: '/game/simon', color: '#E2F0CB' },
 ];
 
+const ProgressBar = () => {
+    // Pixel-art style circle CSS
+    const circleStyle: React.CSSProperties = {
+        width: '50px',
+        height: '50px',
+        borderRadius: '50%',
+        border: '4px solid #333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1.5rem',
+        background: 'white',
+        position: 'relative',
+        zIndex: 2,
+        boxShadow: '4px 4px 0px rgba(0,0,0,0.2)' // Pixel shadow effect
+    };
+
+    const activeStyle: React.CSSProperties = {
+        ...circleStyle,
+        background: '#FF6B6B',
+        color: 'white',
+        borderColor: '#8B0000',
+    };
+
+    const completedStyle: React.CSSProperties = {
+        ...circleStyle,
+        background: '#4CD137',
+        color: 'white',
+        borderColor: '#2E7D32',
+    };
+
+    const lineStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '50%',
+        left: '0',
+        right: '0',
+        height: '6px',
+        background: '#ddd',
+        transform: 'translateY(-50%)',
+        zIndex: 1,
+        border: '2px solid #ccc'
+    };
+
+    return (
+        <div style={{ position: 'relative', width: '100%', maxWidth: '300px', margin: '0 auto 2rem auto', display: 'flex', justifyContent: 'space-between' }}>
+            {/* Connecting Line */}
+            <div style={lineStyle}>
+                {/* Progress fill (50% because we are at step 2 of 3) */}
+                <div style={{ width: '50%', height: '100%', background: '#4CD137' }}></div>
+            </div>
+
+            {/* Step 1: Quiz (Done) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+                <div style={completedStyle}>📝</div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', marginTop: '5px', color: '#4CD137' }}>Quiz</span>
+            </div>
+
+            {/* Step 2: Game Hub (Active) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+                <div style={activeStyle}>🎮</div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', marginTop: '5px', color: '#FF6B6B' }}>Games</span>
+            </div>
+
+            {/* Step 3: Flag (Pending) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+                <div style={circleStyle}>🚩</div>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', marginTop: '5px', color: '#999' }}>Goal</span>
+            </div>
+        </div>
+    );
+};
+
 const GameHub: React.FC = () => {
     const navigate = useNavigate();
 
@@ -42,20 +114,18 @@ const GameHub: React.FC = () => {
                     ← Back to Avatar
                 </button>
 
-                <h1 style={{ textAlign: 'center', fontSize: '3rem', marginBottom: '0.5rem', color: '#FF6B6B' }}>Play & Grow! 🎮</h1>
+                <ProgressBar />
+
+                <h1 style={{ textAlign: 'center', fontSize: '3rem', marginBottom: '0.5rem', color: '#FF6B6B' }}>Play & Grow!</h1>
                 <p style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '1.2rem', color: '#666' }}>
-                    Choose a game to earn coins and make your avatar happy!
+                    Choose a game to earn food and make your avatar happy!
                 </p>
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', // Auto-fit but wider minmax naturally limits cols
-                    // Or for strict 3 col on large screens:
-                    // gridTemplateColumns: 'repeat(3, 1fr)', 
-                    // But we need mobile responsiveness. Let's use media query style logic or CSS Grid smarts.
-                    // User asked for "3 by 3 view".
-                    gap: '1.5rem',
-                    padding: '1rem'
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '10px',
+                    padding: '10px'
                 }}>
                     {MINI_GAMES.map((game) => (
                         <div
@@ -67,13 +137,13 @@ const GameHub: React.FC = () => {
                                 background: `linear-gradient(135deg, ${game.color} 0%, rgba(255,255,255,0.8) 100%)`,
                                 border: '4px solid white',
                                 transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                padding: '1.5rem',
+                                padding: '10px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                minHeight: '200px',
-                                boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+                                minHeight: '140px',
+                                boxShadow: '0 5px 10px rgba(0,0,0,0.1)'
                             }}
                             onClick={() => navigate(game.path)}
                             onMouseEnter={(e) => {
@@ -86,32 +156,23 @@ const GameHub: React.FC = () => {
                             }}
                         >
                             <div style={{
-                                fontSize: '4rem',
-                                marginBottom: '1rem',
+                                fontSize: '2.5rem',
+                                marginBottom: '0.5rem',
                                 filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.1))'
                             }}>{game.emoji}</div>
 
                             <h3 style={{
-                                fontSize: '1.4rem',
-                                marginBottom: '0.5rem',
+                                fontSize: '1rem',
+                                marginBottom: '0.2rem',
                                 color: '#333',
                                 fontWeight: 800
                             }}>{game.title}</h3>
 
-                            <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                {game.skills.map(skill => (
-                                    <span key={skill} style={{
-                                        fontSize: '0.75rem',
-                                        background: 'rgba(255,255,255,0.9)',
-                                        padding: '4px 10px',
-                                        borderRadius: '12px',
-                                        fontWeight: 700,
-                                        color: '#555',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                                    }}>
-                                        {skill}
-                                    </span>
-                                ))}
+                            <div style={{ display: 'none' }}>
+                                {/* Hidden skills for mobile compactness, or we can make them very small.
+                                User asked for 3x3 grid, which is tight. Hiding skills helps. 
+                                Or we can just show 1 skill. Let's hide for cleaner look similar to iOS folders. 
+                            */}
                             </div>
                         </div>
                     ))}

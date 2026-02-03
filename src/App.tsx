@@ -25,6 +25,10 @@ import ConnectThree from './pages/games/ConnectThree';
 import SimonSays from './pages/games/SimonSays';
 
 import './index.css';
+import QuizGeneration from './pages/QuizGeneration';
+import QuizUploadSelection from './pages/QuizUploadSelection';
+import QuizReview from './pages/QuizReview';
+import Quizzes from './pages/Quizzes';
 
 function App() {
   return (
@@ -35,6 +39,11 @@ function App() {
         <Route path="/create-avatar" element={<CreateAvatar />} />
         <Route path="/avatar-view" element={<AvatarView />} />
         <Route path="/upload-quiz" element={<UploadQuiz />} />
+        <Route path="/quiz-generation" element={<QuizGeneration />} />
+        <Route path="/quiz-upload" element={<QuizUploadSelection />} />
+        <Route path="/quiz-review" element={<QuizReview />} />
+        <Route path="/quizzes" element={<Quizzes />} />
+
         <Route path="/manual-quiz" element={<ManualQuizInput />} />
         <Route path="/game-hub" element={<GameHub />} />
 
