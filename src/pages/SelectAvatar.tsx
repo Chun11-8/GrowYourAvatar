@@ -26,28 +26,29 @@ const SelectAvatar: React.FC = () => {
                     ← Back
                 </button>
 
-                <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '1rem' }}>Welcome Back!</h1>
-                <p style={{ textAlign: 'center', marginBottom: '3rem', color: '#666' }}>
-                    Select your avatar to continue your adventure
+                <h1 style={{ textAlign: 'center', fontSize: '1.8rem', marginBottom: '0.5rem', color: '#4A90E2' }}>My Friends</h1>
+                <p style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
+                    Select your avatar to continue
                 </p>
 
                 {avatars.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
                         <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🥚</div>
-                        <h3>You don't have any avatars yet!</h3>
+                        <h3>No friends yet!</h3>
                         <button
                             className="clay-button"
-                            style={{ marginTop: '1.5rem' }}
+                            style={{ marginTop: '1rem' }}
                             onClick={() => navigate('/create-avatar')}
                         >
-                            Create Your First Avatar
+                            Create One!
                         </button>
                     </div>
                 ) : (
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                        gap: '2rem'
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '0.8rem',
+                        width: '100%'
                     }}>
                         {avatars.map((avatar) => (
                             <div
@@ -57,21 +58,25 @@ const SelectAvatar: React.FC = () => {
                                     cursor: 'pointer',
                                     textAlign: 'center',
                                     transition: 'transform 0.2s',
-                                    padding: '1.5rem'
+                                    padding: '0.6rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    background: 'white'
                                 }}
                                 onClick={() => handleSelect(avatar)}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
                                 <div style={{
-                                    width: '120px',
-                                    height: '120px',
+                                    width: 'clamp(50px, 15vw, 90px)',
+                                    height: 'clamp(50px, 15vw, 90px)',
                                     borderRadius: '50%',
                                     background: 'var(--soft-blue)',
-                                    margin: '0 auto 1rem auto',
+                                    margin: '0 auto 0.5rem auto',
                                     overflow: 'hidden',
-                                    border: '4px solid white',
-                                    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                                    border: '3px solid white',
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                                 }}>
                                     <img
                                         src={avatar.image}
@@ -79,15 +84,26 @@ const SelectAvatar: React.FC = () => {
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
                                 </div>
-                                <h3 style={{ color: '#4A90E2', marginBottom: '0.5rem' }}>{avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)} Friend</h3>
+                                <h3 style={{
+                                    color: '#4A90E2',
+                                    fontSize: '0.75rem',
+                                    marginBottom: '0.3rem',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    width: '100%'
+                                }}>
+                                    {avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)}
+                                </h3>
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'center',
-                                    gap: '10px',
-                                    fontSize: '0.9rem'
+                                    gap: '5px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 700
                                 }}>
-                                    <span>❤️ {avatar.stats.health}/5</span>
-                                    <span>😊 {avatar.stats.mood}/5</span>
+                                    <span>❤️ {avatar.stats.health}</span>
+                                    <span>😊 {avatar.stats.mood}</span>
                                 </div>
                             </div>
                         ))}
@@ -104,12 +120,13 @@ const SelectAvatar: React.FC = () => {
                                 flexDirection: 'column',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                padding: '1.5rem'
+                                padding: '0.6rem',
+                                minHeight: '100px'
                             }}
                             onClick={() => navigate('/create-avatar')}
                         >
-                            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>➕</div>
-                            <p style={{ fontWeight: 700, color: 'var(--soft-blue)' }}>New Avatar</p>
+                            <div style={{ fontSize: '1.5rem', marginBottom: '0.3rem' }}>➕</div>
+                            <p style={{ fontWeight: 700, color: 'var(--soft-blue)', fontSize: '0.7rem' }}>New</p>
                         </div>
                     </div>
                 )}

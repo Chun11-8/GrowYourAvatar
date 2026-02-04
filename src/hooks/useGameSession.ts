@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { completeGameSession } from '../utils/storage';
 
 interface GameSessionResult {
     score: number;
@@ -10,10 +12,23 @@ interface GameSessionResult {
     resetGame: () => void;
 }
 
-export const useGameSession = (maxRounds: number = 5): GameSessionResult => {
+export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSessionResult => {
+    const location = useLocation();
+    const effectiveAvatarId = avatarId || (location.state as any)?.avatarId;
+
     const [score, setScore] = useState(0);
     const [round, setRound] = useState(1);
     const [isGameOver, setIsGameOver] = useState(false);
+
+    // Scenario 2: Handle game completion rewards
+    useEffect(() => {
+        if (isGameOver && effectiveAvatarId) {
+            const { rewarded } = completeGameSession(effectiveAvatarId);
+            if (rewarded) {
+                console.log('Health reward granted for avatar:', effectiveAvatarId);
+            }
+        }
+    }, [isGameOver, effectiveAvatarId]);
 
     const checkGameOver = useCallback((currentRound: number) => {
         if (currentRound > maxRounds) {

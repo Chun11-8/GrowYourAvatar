@@ -9,11 +9,14 @@ export type MoodState = 'happy' | 'sad' | 'excited' | 'sleepy';
 export interface AvatarData {
     id: string;
     image: string;
-    style: string; 
+    style: string;
     voxelCode?: string;
     stats: AvatarStats;
     currentMoodState: MoodState;
     createdAt: number;
+    lastDailyUpdate?: number;
+    lastPlayedAt?: number;
+    quizCompleted?: boolean;
 }
 
 const STORAGE_KEY = 'grow_your_avatar_data';
@@ -56,3 +59,30 @@ export const createInitialStats = (): AvatarStats => ({
     mana: 5,
     mood: 5
 });
+
+/**
+ * Handles logic for Scenario 2: Earning HP after Quiz + Game
+ */
+export const completeGameSession = (avatarId: string): { rewarded: boolean } => {
+    const avatar = getAvatarById(avatarId);
+    if (!avatar) return { rewarded: false };
+
+    let rewarded = false;
+    const updatedAvatar = { ...avatar };
+
+    // Scenario 2: if quiz was completed, give 1 health
+    if (avatar.quizCompleted) {
+        updatedAvatar.stats = {
+            ...avatar.stats,
+            health: Math.min(5, avatar.stats.health + 1)
+        };
+        updatedAvatar.quizCompleted = false; // Reset for next session
+        rewarded = true;
+    }
+
+    // Mark as played to prevent Scenario 1 penalty
+    updatedAvatar.lastPlayedAt = Date.now();
+
+    saveAvatar(updatedAvatar);
+    return { rewarded };
+};

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getAvatarById, saveAvatar } from '../utils/storage';
 
 interface Question {
     id: string | number;
@@ -13,7 +14,7 @@ const Quizzes: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const questions: Question[] = location.state?.questions || [];
+    const { questions = [], avatarId } = (location.state as { questions?: Question[], avatarId?: string }) || { questions: [] };
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
@@ -78,6 +79,14 @@ const Quizzes: React.FC = () => {
             setSelectedOption(null);
             setFeedback(null);
         } else {
+            // Quiz completed - Save to avatar data
+            if (avatarId) {
+                const avatar = getAvatarById(avatarId);
+                if (avatar) {
+                    saveAvatar({ ...avatar, quizCompleted: true });
+                    console.log('Quiz completed recorded');
+                }
+            }
             setGameState('finished');
         }
     };
@@ -99,10 +108,10 @@ const Quizzes: React.FC = () => {
                     {score >= 7 && (
                         <button
                             className="clay-button"
-                            onClick={() => navigate('/game-hub')}
+                            onClick={() => navigate('/game-hub', { state: { avatarId } })}
                             style={{ fontSize: '1.5rem', padding: '15px 30px', background: '#CAFFBF' }}
                         >
-                            Adventure Complete! 🏠
+                            Adventure Complete! Proceed to next game 🏠
                         </button>)}
                     {score < 7 && (
                         <button

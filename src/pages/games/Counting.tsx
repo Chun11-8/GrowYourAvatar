@@ -9,7 +9,9 @@ const Counting: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
+    //Actual Implementation
+    //const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess } = useGameSession(5);
 
     const [count, setCount] = useState(3);
     const [emoji, setEmoji] = useState('🍎');

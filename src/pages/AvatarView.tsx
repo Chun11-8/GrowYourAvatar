@@ -13,7 +13,8 @@ import springBg from '../assets/backgrounds/background_spring.png';
 import summerBg from '../assets/backgrounds/background_summer.png';
 import autumnBg from '../assets/backgrounds/background_autumn.png';
 import winterBg from '../assets/backgrounds/background_winter.png';
-
+import forestBg from '../assets/backgrounds/background_forest.png';
+import seaBg from '../assets/backgrounds/background_sea.png';
 const AvatarView: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -57,6 +58,40 @@ const AvatarView: React.FC = () => {
             //handleLoadDummy();
         }
     }, [avatarId, image, style]);
+
+    // Scenario 1: Daily Health Deduction
+    useEffect(() => {
+        if (!avatar) return;
+
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const lastUpdate = avatar.lastDailyUpdate || avatar.createdAt;
+        const lastPlay = avatar.lastPlayedAt || avatar.createdAt;
+
+        // Check if 24 hours have passed since the last deduction check
+        if (now - lastUpdate >= oneDay) {
+            let updatedHealth = avatar.stats.health;
+            let updatedLastDailyUpdate = now;
+
+            // If they haven't played for more than 24 hours, deduct 2 HP
+            if (now - lastPlay >= oneDay) {
+                updatedHealth = Math.max(0, avatar.stats.health - 2);
+                console.log(`Daily penalty: -2 HP. New Health: ${updatedHealth}`);
+            }
+
+            const updatedAvatar: AvatarData = {
+                ...avatar,
+                stats: {
+                    ...avatar.stats,
+                    health: updatedHealth
+                },
+                lastDailyUpdate: updatedLastDailyUpdate
+            };
+
+            setAvatar(updatedAvatar);
+            saveAvatar(updatedAvatar);
+        }
+    }, [avatar?.id]); // Only run when avatar loads or changes identity
 
     const handleGenerateVoxel = async () => {
         if (!image || !style) return;
@@ -136,7 +171,9 @@ const AvatarView: React.FC = () => {
         const updatedAvatar: AvatarData = {
             ...avatar,
             stats: newStats,
-            currentMoodState: newMood || avatar.currentMoodState
+            currentMoodState: newMood || avatar.currentMoodState,
+            // Reset daily update on manual changes if needed? 
+            // Better to just update stats and keep timestamps.
         };
 
         saveAvatar(updatedAvatar);
@@ -149,13 +186,15 @@ const AvatarView: React.FC = () => {
     };
 
 
-    const [season, setSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter'>('spring');
+    const [season, setSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter' | 'forest' | 'sea'>('spring');
 
     const toggleSeason = () => {
         setSeason(prev => {
             if (prev === 'spring') return 'summer';
             if (prev === 'summer') return 'autumn';
             if (prev === 'autumn') return 'winter';
+            if (prev === 'winter') return 'forest';
+            if (prev === 'forest') return 'sea';
             return 'spring';
         });
     };
@@ -166,6 +205,8 @@ const AvatarView: React.FC = () => {
             case 'summer': return '☀️';
             case 'autumn': return '🍂';
             case 'winter': return '❄️';
+            case 'forest': return '🌳';
+            case 'sea': return '🌊';
         }
     };
 
@@ -176,6 +217,8 @@ const AvatarView: React.FC = () => {
             case 'summer': bgImage = summerBg; break;
             case 'autumn': bgImage = autumnBg; break;
             case 'winter': bgImage = winterBg; break;
+            case 'forest': bgImage = forestBg; break;
+            case 'sea': bgImage = seaBg; break;
         }
         return {
             backgroundImage: `url(${bgImage})`,
@@ -200,175 +243,260 @@ const AvatarView: React.FC = () => {
     }
 
     return (
-        <div className="avatar-view-container" style={{ width: '100%', maxWidth: '800px', padding: '10px' }}>
-            <div className="clay-container" style={{ position: 'relative', overflow: 'hidden', padding: '1.5rem' }}>
+        <div className="avatar-view-fullscreen" style={{
+            width: '100vw',
+            height: '100vh',
+            overflow: 'hidden',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            ...getBackgroundStyle(),
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '1.5rem',
+            boxSizing: 'border-box'
+        }}>
+            {/* Overlay for better readability if needed, but the user wants the background to fill everything */}
 
-                {/* Header Controls (Flex vs Absolute for mobile) */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '1rem',
-                    zIndex: 10,
-                    position: 'relative'
-                }}>
-                    <button
-                        className="clay-button secondary"
-                        style={{ padding: '8px 16px', fontSize: '0.9rem' }}
-                        onClick={() => navigate('/select-avatar')}
-                    >
-                        ← Friends
-                    </button>
+            {/* Header Controls */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1rem',
+                zIndex: 10,
+                width: '100%'
+            }}>
+                <button
+                    className="clay-button secondary"
+                    style={{ padding: '8px 16px', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                    onClick={() => navigate('/select-avatar')}
+                >
+                    ← Log Out
+                </button>
 
-                    <button
-                        className="clay-button"
-                        style={{
-                            padding: '8px 12px',
-                            fontSize: '1.2rem',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            minWidth: '50px'
-                        }}
-                        onClick={toggleSeason}
-                    >
-                        {getSeasonIcon()}
-                    </button>
-                </div>
+                <button
+                    className="clay-button"
+                    style={{
+                        padding: '8px 12px',
+                        fontSize: '1.2rem',
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        minWidth: '50px',
+                        backdropFilter: 'blur(5px)'
+                    }}
+                    onClick={toggleSeason}
+                >
+                    {getSeasonIcon()}
+                </button>
+            </div>
 
-                {/* Stats Bar */}
-                <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    justifyContent: 'center',
-                    marginBottom: '1rem',
-                    zIndex: 10
-                }}>
-                    <StatBadge label="❤️" value={avatar?.stats.health || 0} />
-                    <StatBadge label="✨" value={avatar?.stats.mana || 0} />
-                    <StatBadge label="😊" value={avatar?.stats.mood || 0} />
-                </div>
+            {/* Stats Bar */}
+            <div style={{
+                display: 'flex',
+                gap: '0.8rem',
+                justifyContent: 'center',
+                marginBottom: '1.5rem',
+                zIndex: 10
+            }}>
+                <StatBadge label="❤️" value={avatar?.stats.health || 0} />
+                <StatBadge label="✨" value={avatar?.stats.mana || 0} />
+                <StatBadge label="😊" value={avatar?.stats.mood || 0} />
+            </div>
 
-                <div style={{ clear: 'both' }}></div>
-
-                {/* Main View Area */}
-                <div style={{
-                    margin: '0 auto',
-                    width: '100%',
-                    height: 'auto',
-                    aspectRatio: '4/5', // Mobile portrait friendly
-                    maxHeight: '60vh',
-                    ...getBackgroundStyle(),
-                    borderRadius: '40px',
-                    boxShadow: 'var(--clay-shadow-inset)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    border: '8px solid white',
-                    transition: 'background 0.5s ease'
-                }}>
-                    {status === 'generating' && (
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            background: 'white',
-                            zIndex: 20,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: '2rem'
-                        }}>
-                            <div className="clay-card" style={{ background: 'var(--soft-blue)', color: 'white', textAlign: 'center' }}>
-                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-                                <h3 style={{ marginBottom: '10px' }}>Creating Magic...</h3>
-                                <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>{thinkingText || 'Bringing your avatar to life in 3D'}</p>
-                                <div style={{ marginTop: '20px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                                    {[0, 1, 2].map(i => (
-                                        <div key={i} style={{
-                                            width: '12px',
-                                            height: '12px',
-                                            background: 'white',
-                                            borderRadius: '50%',
-                                            animation: `float 1s infinite alternate ${i * 0.2}s`
-                                        }}></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {status === 'error' && (
-                        <div style={{ padding: '20px', color: '#ff6b6b', textAlign: 'center', zIndex: 20 }}>
-                            <h3>Oops! Something went wrong</h3>
-                            <p>{errorMsg}</p>
-                            <button className="clay-button" onClick={handleGenerateVoxel} style={{ marginTop: '20px' }}>Try Again</button>
-                        </div>
-                    )}
-
-                    {avatar?.voxelCode ? (
-                        <iframe
-                            ref={iframeRef}
-                            title="Voxel Scene"
-                            srcDoc={avatar.voxelCode}
-                            style={{ width: '100%', height: '100%', border: '0' }}
-                            sandbox="allow-scripts allow-same-origin"
-                        />
-                    ) : (
-                        avatar?.image && (
-                            <div style={{ textAlign: 'center' }}>
-                                <img src={avatar.image} alt="Avatar" style={{ width: '250px', borderRadius: '40px', boxShadow: 'var(--clay-shadow)' }} />
-                            </div>
-                        )
-                    )}
-
-                    {/* Interaction Tooltip */}
+            {/* Main View Area - 3D Glass Frame */}
+            <div style={{
+                flex: 1, // Take up remaining space
+                width: '100%',
+                maxWidth: '600px',
+                margin: '0 auto',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(15px)',
+                borderRadius: '40px',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 10px rgba(255,255,255,0.2)',
+                overflow: 'hidden',
+                zIndex: 5
+            }}>
+                {status === 'generating' && (
                     <div style={{
                         position: 'absolute',
-                        bottom: '20px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: 'rgba(255,255,255,0.8)',
-                        padding: '4px 8px',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        color: '#4A90E2',
-                        backdropFilter: 'blur(4px)',
-                        pointerEvents: 'none'
+                        inset: 0,
+                        background: 'rgba(255,255,255,0.9)',
+                        zIndex: 20,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '2rem'
                     }}>
-                        Tap to Pat or Tickle! ✨
+                        <div className="clay-card" style={{ background: 'var(--soft-blue)', color: 'white', textAlign: 'center' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
+                            <h3 style={{ marginBottom: '10px' }}>Creating Magic...</h3>
+                            <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>{thinkingText || 'Bringing your avatar to life in 3D'}</p>
+                            <div style={{ marginTop: '20px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                {[0, 1, 2].map(i => (
+                                    <div key={i} style={{
+                                        width: '12px',
+                                        height: '12px',
+                                        background: 'white',
+                                        borderRadius: '50%',
+                                        animation: `float 1s infinite alternate ${i * 0.2}s`
+                                    }}></div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+                )}
+
+                {status === 'error' && (
+                    <div style={{ padding: '20px', color: '#ff6b6b', textAlign: 'center', zIndex: 20 }}>
+                        <h3>Oops! Something went wrong</h3>
+                        <p>{errorMsg}</p>
+                        <button className="clay-button" onClick={handleGenerateVoxel} style={{ marginTop: '20px' }}>Try Again</button>
+                    </div>
+                )}
+
+                {avatar?.voxelCode ? (
+                    <iframe
+                        ref={iframeRef}
+                        title="Voxel Scene"
+                        srcDoc={avatar.voxelCode}
+                        style={{ width: '100%', height: '100%', border: '0' }}
+                        sandbox="allow-scripts allow-same-origin"
+                    />
+                ) : (
+                    avatar?.image && (
+                        <div style={{ textAlign: 'center' }}>
+                            <img src={avatar.image} alt="Avatar" style={{ width: '250px', borderRadius: '40px', boxShadow: 'var(--clay-shadow)' }} />
+                        </div>
+                    )
+                )}
+
+                {/* Interaction Tooltip */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(255,255,255,0.4)',
+                    padding: '6px 16px',
+                    borderRadius: '20px',
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    color: 'black',
+                    backdropFilter: 'blur(10px)',
+                    pointerEvents: 'none',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                }}>
+                    Tap to Pat or Tickle! ✨
                 </div>
 
-                {/* Interaction Buttons */}
+
+            </div>
+
+            {/* Mood Text */}
+            <div style={{
+                textAlign: 'center',
+                padding: '1rem 0',
+                fontSize: '1.2rem',
+                fontWeight: 700,
+                color: 'black',
+                borderRadius: '20px',
+                background: 'rgba(255,255,255,0.4)',
+                zIndex: 10
+            }}>
+                Feeling {avatar?.currentMoodState || 'happy'} today!
+            </div>
+
+            {/* Interaction Buttons Container */}
+            <div style={{
+                position: 'relative',
+                height: '180px', // Reduced height to fit everything
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10,
+                marginTop: '20px',
+                paddingBottom: '20px'
+            }}>
+
+                {/* Main Diamond Play Button - TOP */}
+                <div style={{
+                    position: 'absolute',
+                    top: '-20px', // Adjusted to overlap slightly or sit just above
+                    zIndex: 12
+                }}>
+                    <button
+                        onClick={() => navigate('/upload-quiz', { state: { avatarId: avatar?.id } })}
+                        style={{
+                            width: '90px',
+                            height: '90px',
+                            background: 'linear-gradient(135deg, #FF7E5F 0%, #FEB47B 100%)',
+                            border: '4px solid white',
+                            borderRadius: '18px',
+                            transform: 'rotate(45deg)',
+                            boxShadow: '0 8px 0 #E66A4E, 0 12px 20px rgba(0,0,0,0.4)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.1s ease',
+                            outline: 'none'
+                        }}
+                        onMouseDown={(e) => {
+                            e.currentTarget.style.transform = 'rotate(45deg) translateY(4px)';
+                            e.currentTarget.style.boxShadow = '0 4px 0 #E66A4E, 0 8px 15px rgba(0,0,0,0.3)';
+                        }}
+                        onMouseUp={(e) => {
+                            e.currentTarget.style.transform = 'rotate(45deg) translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 8px 0 #E66A4E, 0 12px 20px rgba(0,0,0,0.4)';
+                        }}
+                    >
+                        <div style={{
+                            transform: 'rotate(-45deg)',
+                            color: 'white',
+                            textAlign: 'center'
+                        }}>
+                            <span style={{ fontSize: '1.6rem', display: 'block', textShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}>🎮</span>
+                            <span style={{ fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>PLAY</span>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Bubble Buttons wrapping below */}
                 <div style={{
                     display: 'flex',
-                    gap: '1rem',
-                    justifyContent: 'center',
-                    marginTop: '1.5rem',
-                    flexWrap: 'wrap'
+                    gap: '2rem',
+                    marginTop: '120px',
+                    zIndex: 11
                 }}>
-                    <ActionButton icon="🍎" label="Feed" onClick={() => handleAction('feed')} />
-
-                    <div onClick={() => navigate('/upload-quiz', { state: { avatarId: avatar?.id } })} style={{ cursor: 'pointer' }}>
-                        <ActionButton icon="🎮" label="Play" onClick={() => { }} />
-                    </div>
-
-                    <ActionButton icon="💤" label="Rest" onClick={() => handleAction('rest')} />
-                    <ActionButton icon="✨" label="Train" onClick={() => handleAction('train')} />
-                </div>
-
-                {/* Current Mood Text */}
-                <div style={{
-                    textAlign: 'center',
-                    marginTop: '2rem',
-                    fontSize: '1.2rem',
-                    fontWeight: 700,
-                    color: '#666'
-                }}>
-                    Feeling {avatar?.currentMoodState || 'happy'} today!
+                    <BubbleButton
+                        icon="🍎"
+                        label="Feed"
+                        color="#7ED957"
+                        shadowColor="#5BA33D"
+                        onClick={() => handleAction('feed')}
+                    />
+                    <BubbleButton
+                        icon="💤"
+                        label="Rest"
+                        color="#5CE1E6"
+                        shadowColor="#3FA9B0"
+                        onClick={() => handleAction('rest')}
+                    />
+                    <BubbleButton
+                        icon="✨"
+                        label="Train"
+                        color="#FFBD59"
+                        shadowColor="#D49942"
+                        onClick={() => handleAction('train')}
+                    />
                 </div>
             </div>
         </div>
@@ -394,23 +522,45 @@ const StatBadge = ({ label, value }: { label: string, value: number }) => (
     </div>
 );
 
-const ActionButton = ({ icon, label, onClick }: { icon: string, label: string, onClick: () => void }) => (
-    <button
-        className="clay-button"
-        onClick={onClick}
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '12px',
-            minWidth: '80px',
-            background: 'white'
-        }}
-    >
-        <span style={{ fontSize: '1.5rem' }}>{icon}</span>
-        <span style={{ fontSize: '0.8rem' }}>{label}</span>
-    </button>
-);
+const BubbleButton = ({ icon, label, onClick, color, shadowColor }: { icon: string, label: string, onClick: () => void, color: string, shadowColor: string }) => {
+    const [isPressed, setIsPressed] = useState(false);
+
+    return (
+        <button
+            onClick={onClick}
+            onMouseDown={() => setIsPressed(true)}
+            onMouseUp={() => setIsPressed(false)}
+            onMouseLeave={() => setIsPressed(false)}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                background: color,
+                border: '3px solid white',
+                boxShadow: isPressed
+                    ? `0 4px 0 ${shadowColor}, 0 6px 10px rgba(0,0,0,0.2)`
+                    : `0 8px 0 ${shadowColor}, 0 12px 15px rgba(0,0,0,0.3)`,
+                cursor: 'pointer',
+                transition: 'all 0.1s ease',
+                transform: isPressed ? 'translateY(4px)' : 'translateY(0)',
+                outline: 'none',
+                position: 'relative'
+            }}
+        >
+            <span style={{ fontSize: '1.5rem' }}>{icon}</span>
+            <span style={{
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                color: 'white',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+                marginTop: '-2px'
+            }}>{label}</span>
+        </button>
+    );
+};
 
 export default AvatarView;

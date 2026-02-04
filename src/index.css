@@ -7,7 +7,7 @@
   --soft-blue: #A2D2FF;
   --white: #ffffff;
   --text-color: #5D5D5D;
-  
+
   --clay-shadow: 8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
   --clay-shadow-inset: inset 6px 6px 12px rgba(163, 177, 198, 0.3), inset -6px -6px 12px rgba(255, 255, 255, 0.7);
   --clay-radius: 30px;
@@ -79,7 +79,7 @@ h1 {
   font-size: 3rem;
   font-weight: 800;
   color: #4A90E2;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
 
@@ -91,8 +91,8 @@ h1 {
   height: 100%;
   z-index: -1;
   background: radial-gradient(circle at 20% 20%, var(--peach) 0%, transparent 40%),
-              radial-gradient(circle at 80% 80%, var(--lavender) 0%, transparent 40%),
-              radial-gradient(circle at 50% 50%, var(--mint) 0%, var(--mint) 100%);
+    radial-gradient(circle at 80% 80%, var(--lavender) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, var(--mint) 0%, var(--mint) 100%);
 }
 
 .floating-shape {
@@ -104,8 +104,15 @@ h1 {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
 }
 
 /* --- Mobile Responsiveness --- */
@@ -113,19 +120,22 @@ h1 {
   :root {
     --clay-radius: 20px;
   }
-  
+
   body {
-    align-items: flex-start; /* Allow scrolling from top */
+    align-items: flex-start;
+    /* Allow scrolling from top */
     padding-top: 20px;
     padding-bottom: 20px;
   }
 
   h1 {
-    font-size: 2rem; /* Smaller heading */
+    font-size: 2rem;
+    /* Smaller heading */
   }
 
   .clay-container {
-    padding: 1rem; /* Reduced padding */
+    padding: 1rem;
+    /* Reduced padding */
     border-width: 2px;
   }
 
@@ -133,9 +143,10 @@ h1 {
     padding: 10px 18px;
     font-size: 1rem;
   }
-  
+
   /* Make all clay containers full width on mobile minus padding */
-  .avatar-view-container, .game-hub-container {
+  .avatar-view-container,
+  .game-hub-container {
     padding: 5px !important;
     width: 100% !important;
   }

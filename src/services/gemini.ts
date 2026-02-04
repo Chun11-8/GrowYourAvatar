@@ -65,7 +65,10 @@ function buildCharacter(createVoxel, rig) {
 - Do NOT use markdown code blocks.
 `;
 
-export const generateImage = async (prompt: string, aspectRatio: string = '1:1', optimize: boolean = true): Promise<string> => {
+export const generateImage = async (prompt: string, optimize: boolean = true): Promise<string> => {
+
+    //Actual implementation
+    //export const generateImage = async (prompt: string, aspectRatio: string = '1:1', optimize: boolean = true): Promise<string> => {
     try {
         let finalPrompt = prompt;
 

@@ -20,7 +20,9 @@ const QuizUploadSelection: React.FC = () => {
 
             try {
                 // Determine if image (simple check)
-                const isImage = file.type.startsWith('image/');
+
+                //Actual Implementation line below
+                //const isImage = file.type.startsWith('image/');
 
                 // For now, simpler implementation: treat everything that FileReader reads as potential input for Vision
                 // Gemini 1.5 Flash supports PDF via base64 as well in the prompt, or images
