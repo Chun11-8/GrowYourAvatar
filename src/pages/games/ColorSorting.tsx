@@ -13,7 +13,7 @@ const ColorSorting: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess } = useGameSession(5);
 
     const [currentItem, setCurrentItem] = useState(COLORS[0]);
     // const [score, setScore] = useState(0);
@@ -42,115 +42,95 @@ const ColorSorting: React.FC = () => {
 
     if (isGameOver) {
         return (
-            <div
-                className="game-container"
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    background: 'rgba(0,0,0,0.8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    cursor: 'pointer'
-                }}
-                onClick={() => navigate('/avatar-view', { state: { avatarId } })}
-            >
+            <div className="game-container" style={{
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                zIndex: 1000, cursor: 'pointer'
+            }} onClick={() => navigate('/avatar-view', { state: { avatarId } })}>
                 <div className="clay-container" style={{
-                    background: '#fff',
-                    padding: '30px',
-                    maxWidth: '90%',
-                    width: '500px',
-                    textAlign: 'center',
-                    borderRadius: '20px',
-                    animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    background: '#fff', padding: 'clamp(20px, 5vw, 40px)', width: '90%', maxWidth: '450px',
+                    textAlign: 'center', borderRadius: '24px'
                 }}>
-                    <img
-                        src={congratulations}
-                        alt="Congratulations"
-                        style={{
-                            width: '100%',
-                            borderRadius: '15px',
-                            marginBottom: '20px',
-                            border: '4px solid #FFD1DC'
-                        }}
-                    />
-
-                    <h2 style={{ color: '#FF6B6B', fontSize: '2rem', marginBottom: '10px' }}>
-                        Congratulation! 🎉
-                    </h2>
-
-                    <p style={{ fontSize: '1.2rem', color: '#555', marginBottom: '20px', lineHeight: '1.5' }}>
-                        You have completed the mission and here is your rewards!
-                    </p>
-
-                    <div style={{ fontSize: '5rem', marginBottom: '20px', animation: 'bounce 2s infinite' }}>
-                        🍎
-                    </div>
-
-                    <p style={{ fontSize: '1rem', color: '#888' }}>
-                        (Tap anywhere to collect)
-                    </p>
+                    <img src={congratulations} alt="Congratulations" style={{ width: '100%', borderRadius: '15px', marginBottom: '15px', border: '4px solid #FFD1DC' }} />
+                    <h2 style={{ color: '#FF6B6B', fontSize: 'clamp(1.5rem, 6vw, 2.2rem)', marginBottom: '10px' }}>Well Done! 🎉</h2>
+                    <p style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: '#555', marginBottom: '15px' }}>Mission completed! Here is your reward!</p>
+                    <div style={{ fontSize: '4rem', marginBottom: '15px' }}>🍎</div>
+                    <p style={{ fontSize: '0.9rem', color: '#888' }}>(Tap to collect)</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
-            <div className="clay-container" style={{ background: '#fff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
-                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Color Sorter</h2>
-                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+        <div className="game-container" style={{
+            height: '100vh', width: '100vw', background: '#FDFFB6', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', padding: '15px', boxSizing: 'border-box'
+        }}>
+            <div className="clay-container" style={{
+                background: '#fff', padding: 'clamp(12px, 3vw, 20px)', flex: 1,
+                display: 'flex', flexDirection: 'column', borderRadius: '24px'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}
+                        style={{ padding: '8px 12px', fontSize: '0.8rem' }}>← BACK</button>
+                    <h2 style={{ fontSize: 'clamp(1.1rem, 5vw, 1.6rem)', margin: 0, flex: 1, textAlign: 'center', fontWeight: 900, color: '#4A90E2' }}>COLOR SORTER</h2>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#666' }}>Round {round}/{maxRounds}</div>
                 </div>
 
-                <div className="score-board" style={{ fontSize: '1.5rem', margin: '1rem 0', fontWeight: 700 }}>
+                <div style={{ flexShrink: 0, textAlign: 'center', fontSize: '1.2rem', fontWeight: 800, color: '#333', marginBottom: '5px' }}>
                     Items Sorted: {score}
                 </div>
 
-                <div className="item-to-sort" style={{ margin: '2rem 0' }}>
-                    <div style={{ fontSize: '6rem', animation: 'bounce 2s infinite' }}>{currentItem.emoji}</div>
-                    <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>{message}</p>
-                </div>
-
-                <div className="baskets" style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '2rem',
-                    marginTop: '3rem'
+                <div style={{
+                    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', margin: '5px 0'
                 }}>
-                    {COLORS.map((c) => (
-                        <div
-                            key={c.name}
-                            onClick={() => handleSort(c.name)}
-                            className="clay-card"
-                            style={{
-                                background: c.hex,
-                                width: '120px',
-                                height: '100px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                border: '6px solid white'
-                            }}
-                        >
-                            <span style={{ fontWeight: 900, fontSize: '1.2rem', color: 'white', textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>
-                                {c.name}
-                            </span>
-                        </div>
-                    ))}
+                    <div className="item-to-sort" style={{
+                        marginBottom: '30px',
+                        textAlign: 'center',
+                        flexShrink: 0
+                    }}>
+                        <div style={{ fontSize: 'clamp(4rem, 15vw, 7rem)', animation: 'bounce 2s infinite' }}>{currentItem.emoji}</div>
+                        <p style={{ fontWeight: 800, fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: '#555', marginTop: '10px' }}>{message}</p>
+                    </div>
+
+                    <div className="baskets" style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 'clamp(10px, 3vw, 30px)',
+                        width: '100%',
+                        flexWrap: 'wrap'
+                    }}>
+                        {COLORS.map((c) => (
+                            <button
+                                key={c.name}
+                                onClick={() => handleSort(c.name)}
+                                className="clay-card"
+                                style={{
+                                    background: c.hex,
+                                    width: 'clamp(80px, 25vw, 120px)',
+                                    height: 'clamp(70px, 20vw, 100px)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    border: '6px solid white',
+                                    padding: 0
+                                }}
+                            >
+                                <span style={{ fontWeight: 900, fontSize: 'clamp(0.9rem, 3.5vw, 1.2rem)', color: 'white', textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>
+                                    {c.name}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <style>{`
                 @keyframes bounce {
                     0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-20px); }
+                    50% { transform: translateY(-15px); }
                 }
             `}</style>
         </div>

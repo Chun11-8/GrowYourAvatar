@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllAvatars, type AvatarData } from '../utils/storage';
+import { getAllAvatars, deleteAvatar, type AvatarData } from '../utils/storage';
 
 const SelectAvatar: React.FC = () => {
     const [avatars, setAvatars] = useState<AvatarData[]>([]);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -13,6 +14,23 @@ const SelectAvatar: React.FC = () => {
 
     const handleSelect = (avatar: AvatarData) => {
         navigate('/avatar-view', { state: { avatarId: avatar.id } });
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        setDeletingId(id);
+    };
+
+    const confirmDelete = () => {
+        if (deletingId) {
+            deleteAvatar(deletingId);
+            setAvatars(prev => prev.filter(a => a.id !== deletingId));
+            setDeletingId(null);
+        }
+    };
+
+    const cancelDelete = () => {
+        setDeletingId(null);
     };
 
     return (
@@ -68,6 +86,31 @@ const SelectAvatar: React.FC = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
+                                <button
+                                    onClick={(e) => handleDeleteClick(e, avatar.id)}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '5px',
+                                        right: '5px',
+                                        background: 'rgba(255,107,107,0.15)',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '24px',
+                                        height: '24px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        zIndex: 10,
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    title="Delete Avatar"
+                                >
+                                    🗑️
+                                </button>
                                 <div style={{
                                     width: 'clamp(50px, 15vw, 90px)',
                                     height: 'clamp(50px, 15vw, 90px)',
@@ -93,7 +136,7 @@ const SelectAvatar: React.FC = () => {
                                     textOverflow: 'ellipsis',
                                     width: '100%'
                                 }}>
-                                    {avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)}
+                                    {avatar.name || avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)}
                                 </h3>
                                 <div style={{
                                     display: 'flex',
@@ -131,6 +174,48 @@ const SelectAvatar: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Custom Delete Confirmation Modal */}
+            {deletingId && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0,0,0,0.5)',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div className="clay-container" style={{ maxWidth: '350px', transform: 'scale(1)', animation: 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
+                        <div className="clay-card" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>😟</div>
+                            <h3 style={{ marginBottom: '1rem', color: '#ff6b6b' }}>Delete Friend?</h3>
+                            <p style={{ marginBottom: '2rem', fontSize: '0.9rem', color: '#666' }}>
+                                Are you sure you want to say goodbye to {avatars.find(a => a.id === deletingId)?.name || 'this friend'}?
+                                <br />This cannot be undone!
+                            </p>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                <button className="clay-button secondary" onClick={cancelDelete} style={{ flex: 1 }}>
+                                    Keep
+                                </button>
+                                <button className="clay-button" onClick={confirmDelete} style={{ flex: 1, backgroundColor: '#ff6b6b' }}>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <style>{`
+                @keyframes popIn {
+                    from { transform: scale(0.8); opacity: 0; }
+                    to { transform: scale(1); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 };

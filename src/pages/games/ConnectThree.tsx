@@ -10,7 +10,7 @@ const ConnectThree: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, resetGame } = useGameSession(5);
+    const { round, maxRounds, isGameOver, recordSuccess, recordFailure } = useGameSession(5);
     const [board, setBoard] = useState<(string | null)[][]>(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
     const [isRedNext, setIsRedNext] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
@@ -62,116 +62,90 @@ const ConnectThree: React.FC = () => {
         setIsRedNext(true);
     };
 
-    const handleReset = () => {
-        resetGame();
-        setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
-        setWinner(null);
-        setIsRedNext(true);
-    };
-
-
     if (isGameOver) {
         return (
-            <div
-                className="game-container"
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    background: 'rgba(0,0,0,0.8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    cursor: 'pointer'
-                }}
-                onClick={() => navigate('/avatar-view', { state: { avatarId } })}
-            >
+            <div className="game-container" style={{
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                zIndex: 1000, cursor: 'pointer'
+            }} onClick={() => navigate('/avatar-view', { state: { avatarId } })}>
                 <div className="clay-container" style={{
-                    background: '#fff',
-                    padding: '30px',
-                    maxWidth: '90%',
-                    width: '500px',
-                    textAlign: 'center',
-                    borderRadius: '20px',
-                    animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    background: '#fff', padding: 'clamp(20px, 5vw, 40px)', width: '90%', maxWidth: '450px',
+                    textAlign: 'center', borderRadius: '24px'
                 }}>
-                    <img
-                        src={congratulations}
-                        alt="Congratulations"
-                        style={{
-                            width: '100%',
-                            borderRadius: '15px',
-                            marginBottom: '20px',
-                            border: '4px solid #FFD1DC'
-                        }}
-                    />
-
-                    <h2 style={{ color: '#FF6B6B', fontSize: '2rem', marginBottom: '10px' }}>
-                        Congratulation! 🎉
-                    </h2>
-
-                    <p style={{ fontSize: '1.2rem', color: '#555', marginBottom: '20px', lineHeight: '1.5' }}>
-                        You have completed the mission and here is your rewards!
-                    </p>
-
-                    <div style={{ fontSize: '5rem', marginBottom: '20px', animation: 'bounce 2s infinite' }}>
-                        🍎
-                    </div>
-
-                    <p style={{ fontSize: '1rem', color: '#888' }}>
-                        (Tap anywhere to collect)
-                    </p>
+                    <img src={congratulations} alt="Congratulations" style={{ width: '100%', borderRadius: '15px', marginBottom: '15px', border: '4px solid #FFD1DC' }} />
+                    <h2 style={{ color: '#FF6B6B', fontSize: 'clamp(1.5rem, 6vw, 2.2rem)', marginBottom: '10px' }}>Well Done! 🎉</h2>
+                    <p style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: '#555', marginBottom: '15px' }}>Mission completed! Here is your reward!</p>
+                    <div style={{ fontSize: '4rem', marginBottom: '15px' }}>🍎</div>
+                    <p style={{ fontSize: '0.9rem', color: '#888' }}>(Tap to collect)</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
-            <div className="clay-container" style={{ background: '#fff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
-                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Connect-3</h2>
-                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+        <div className="game-container" style={{
+            height: '100vh', width: '100vw', background: '#A0C4FF', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', padding: '15px', boxSizing: 'border-box'
+        }}>
+            <div className="clay-container" style={{
+                background: '#fff', padding: 'clamp(12px, 3vw, 20px)', flex: 1,
+                display: 'flex', flexDirection: 'column', borderRadius: '24px'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}
+                        style={{ padding: '8px 12px', fontSize: '0.8rem' }}>← BACK</button>
+                    <h2 style={{ fontSize: 'clamp(1.1rem, 5vw, 1.6rem)', margin: 0, flex: 1, textAlign: 'center', fontWeight: 900, color: '#4A90E2' }}>CONNECT-3</h2>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#666' }}>Round {round}/{maxRounds}</div>
                 </div>
 
-                <div style={{ margin: '1rem', fontSize: '1.2rem', fontWeight: 700 }}>
+                <div style={{ flexShrink: 0, textAlign: 'center', fontSize: '1.2rem', fontWeight: 800, color: '#333', marginBottom: '5px' }}>
                     {winner ? `Winner: ${winner}! 🎉` : `Turn: ${isRedNext ? '🔴' : '🟡'}`}
                 </div>
 
-                <div className="connect-grid" style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    background: '#A0C4FF',
-                    padding: '15px',
-                    borderRadius: '15px',
-                    maxWidth: '400px',
-                    margin: '2rem auto'
+                <div style={{
+                    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', margin: '5px 0'
                 }}>
-                    {Array.from({ length: COLS }).map((_, c) => (
-                        <div key={c} onClick={() => drop(c)} style={{ display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}>
-                            {Array.from({ length: ROWS }).map((_, r) => (
-                                <div key={r} style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    background: 'white',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '2rem'
-                                }}>
-                                    {board[r][c]}
-                                </div>
-                            ))}
-                        </div>
-                    ))}
+                    <div className="connect-grid" style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 'clamp(5px, 1.5vw, 12px)',
+                        background: '#A0C4FF',
+                        padding: 'clamp(10px, 2vw, 15px)',
+                        borderRadius: '24px',
+                        width: 'fit-content',
+                        margin: '0 auto',
+                        boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.1)'
+                    }}>
+                        {Array.from({ length: COLS }).map((_, c) => (
+                            <div key={c} onClick={() => drop(c)} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(5px, 1.5vw, 12px)', cursor: 'pointer' }}>
+                                {Array.from({ length: ROWS }).map((_, r) => (
+                                    <div key={r} style={{
+                                        width: 'clamp(45px, 12vw, 65px)',
+                                        height: 'clamp(45px, 12vw, 65px)',
+                                        background: 'white',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: 'clamp(1.8rem, 5vw, 2.5rem)',
+                                        boxShadow: 'inset 0 4px 6px rgba(0,0,0,0.05)'
+                                    }}>
+                                        {board[r][c]}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                {winner && <button className="clay-button" onClick={handleNextRound}>Next Round</button>}
+
+                <div style={{ flexShrink: 0, textAlign: 'center', padding: '10px 0' }}>
+                    {winner && (
+                        <button className="clay-button" onClick={handleNextRound}
+                            style={{ padding: '12px 30px', fontSize: '1.1rem' }}>NEXT ROUND 🚀</button>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -30,7 +30,7 @@ const AvatarView: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     // Params from state
-    const { image, style, avatarId } = (location.state as { image?: string, style?: string, avatarId?: string }) || {};
+    const { image, style, name, avatarId } = (location.state as { image?: string, style?: string, name?: string, avatarId?: string }) || {};
 
     const [avatar, setAvatar] = useState<AvatarData | null>(null);
     const [status, setStatus] = useState<'idle' | 'generating' | 'error'>('idle');
@@ -132,8 +132,9 @@ const AvatarView: React.FC = () => {
 
             const newAvatar: AvatarData = {
                 id: Math.random().toString(36).substr(2, 9),
+                name: name || 'Buddy',
                 image,
-                style,
+                style: style || 'voxel',
                 voxelCode: code,
                 stats: createInitialStats(),
                 currentMoodState: 'happy',
@@ -156,6 +157,7 @@ const AvatarView: React.FC = () => {
     const handleLoadDummy = () => {
         const dummyAvatar: AvatarData = {
             id: 'dummy-dog',
+            name: 'Buddy',
             image: '',
             style: 'voxel',
             voxelCode: DUMMY_VOXEL_DOG_CODE,
@@ -323,21 +325,35 @@ const AvatarView: React.FC = () => {
                 zIndex: 10,
                 width: '100%'
             }}>
-                               {/* <button
+                {/* <button
                     className="clay-button secondary"
                     style={{ padding: '8px 16px', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
                     onClick={() => navigate('/select-avatar')}
                 >
                     ← Log Out
                 </button> */}
-               <button
-                    className="clay-button secondary"
-                    style={{ padding: '10px 16px', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    onClick={() => navigate('/select-avatar')}
-                    title="Log Out"
-                >
-                    🏃
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button
+                        className="clay-button secondary"
+                        style={{ padding: '10px 16px', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => navigate('/select-avatar')}
+                        title="Log Out"
+                    >
+                        🏃
+                    </button>
+                    <div style={{
+                        fontWeight: 900,
+                        color: 'white',
+                        fontSize: '1.2rem',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                        background: 'rgba(0,0,0,0.2)',
+                        padding: '4px 16px',
+                        borderRadius: '15px',
+                        backdropFilter: 'blur(5px)'
+                    }}>
+                        Welcome, {avatar?.name || name || 'Buddy'}
+                    </div>
+                </div>
 
                 <button
                     className="clay-button secondary"
@@ -454,7 +470,7 @@ const AvatarView: React.FC = () => {
             </div>
 
             {/* Interaction Tooltip */}
-                {/* <div style={{
+            {/* <div style={{
                     position: 'absolute',
                     bottom: '20px',
                     left: '50%',
@@ -488,7 +504,7 @@ const AvatarView: React.FC = () => {
                 It's a <span style={{ color: 'white', textDecoration: 'underline decoration-wavy' }}>{avatar?.currentMoodState || 'happy'}</span> day!
                 Feeling {avatar?.currentMoodState || 'happy'} today!
             </div>
-            
+
             {/* Mood Text */}
             {/* <div style={{
                 textAlign: 'center',

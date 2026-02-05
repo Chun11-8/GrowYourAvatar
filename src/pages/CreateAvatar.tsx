@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const CreateAvatar: React.FC = () => {
     const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [selectedStyle, setSelectedStyle] = useState<string>('clay');
+    const [avatarName, setAvatarName] = useState<string>('');
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -17,11 +17,6 @@ const CreateAvatar: React.FC = () => {
         }
     };
 
-    const artStyles = [
-        { id: 'clay', name: 'Claymorphism', color: '#B8E4D5' },
-        { id: 'pixel', name: 'Pixel Art', color: '#FFDAB9' },
-        { id: 'voxel', name: 'Voxel (3D)', color: '#A2D2FF' },
-    ];
 
     return (
         <div className="create-avatar-container" style={{ width: '100%', maxWidth: '600px', padding: '20px' }}>
@@ -76,39 +71,28 @@ const CreateAvatar: React.FC = () => {
                         </label>
                     </div>
 
-                    {/* Bottom Section: Style Selection */}
+                    {/* Bottom Section: Avatar Name Input */}
                     <div className="clay-card">
-                        <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>2. Choose Your Style</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-                            {artStyles.map((style) => (
-                                <div
-                                    key={style.id}
-                                    onClick={() => setSelectedStyle(style.id)}
-                                    style={{
-                                        padding: '16px',
-                                        borderRadius: '20px',
-                                        background: selectedStyle === style.id ? style.color : 'rgba(255,255,255,0.8)',
-                                        border: '3px solid',
-                                        borderColor: selectedStyle === style.id ? 'white' : 'transparent',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                        fontWeight: 700,
-                                        textAlign: 'center',
-                                        boxShadow: selectedStyle === style.id ? 'var(--clay-shadow-inset)' : 'var(--clay-shadow)',
-                                        transform: selectedStyle === style.id ? 'scale(0.95)' : 'scale(1)'
-                                    }}
-                                >
-                                    <div style={{
-                                        width: '30px',
-                                        height: '30px',
-                                        borderRadius: '50%',
-                                        background: style.color,
-                                        margin: '0 auto 10px auto',
-                                        border: '2px solid white'
-                                    }}></div>
-                                    {style.name}
-                                </div>
-                            ))}
+                        <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>2. Avatar Name</h3>
+                        <div style={{ padding: '0 10px' }}>
+                            <input
+                                type="text"
+                                placeholder="Enter avatar name..."
+                                value={avatarName}
+                                onChange={(e) => setAvatarName(e.target.value)}
+                                className="clay-input"
+                                style={{
+                                    width: '100%',
+                                    padding: '16px',
+                                    borderRadius: '20px',
+                                    border: '3px solid var(--soft-blue)',
+                                    fontSize: '1.1rem',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    textAlign: 'center',
+                                    outline: 'none',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
@@ -117,12 +101,13 @@ const CreateAvatar: React.FC = () => {
                     <button
                         className="clay-button"
                         style={{ width: '100%', padding: '16px', fontSize: '1.3rem' }}
-                        disabled={!selectedImage}
-                        onClick={() => navigate('/avatar-view', { state: { image: selectedImage, style: selectedStyle } })}
+                        disabled={!selectedImage || !avatarName.trim()}
+                        onClick={() => navigate('/avatar-view', { state: { image: selectedImage, name: avatarName } })}
                     >
                         Generate 3D Avatar! ✨
                     </button>
                     {!selectedImage && <p style={{ fontSize: '0.9rem', color: '#ff6b6b', marginTop: '0.8rem', fontWeight: 600 }}>Please upload an image first</p>}
+                    {selectedImage && !avatarName.trim() && <p style={{ fontSize: '0.9rem', color: '#ff6b6b', marginTop: '0.8rem', fontWeight: 600 }}>Please give your avatar a name</p>}
                 </div>
             </div>
         </div>

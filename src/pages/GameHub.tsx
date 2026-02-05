@@ -23,6 +23,9 @@ export const MINI_GAMES: GameInfo[] = [
     { id: 'number-order', title: 'Order', emoji: '📏', skills: ['Sequencing', 'Numbers'], path: '/game/number-order', color: '#FFD1DC' },
     { id: 'tic-tac-toe', title: 'Tic-Tac-Toe', emoji: '❌', skills: ['Logic', 'Turns'], path: '/game/tic-tac-toe', color: '#E2F0CB' },
     { id: 'rps', title: 'Rock Paper', emoji: '✊', skills: ['Rules', 'Decisions'], path: '/game/rps', color: '#C7CEEA' },
+    { id: 'sudoku', title: 'Sudoku', emoji: '🧩', skills: ['Logic', 'Numbers'], path: '/game/sudoku', color: '#FF9AA2' },
+    { id: 'connect', title: 'Connect 3', emoji: '🔴', skills: ['Strategy', 'Patterns'], path: '/game/connect', color: '#B5EAD7' },
+    { id: 'simon', title: 'Simon', emoji: '🔔', skills: ['Memory', 'Sequencing'], path: '/game/simon', color: '#FFDAC1' },
 ];
 
 const ProgressBar = () => {
@@ -72,7 +75,7 @@ const ProgressBar = () => {
     return (
         <div style={{ position: 'relative', width: '100%', maxWidth: '350px', margin: '0 auto 2rem auto', paddingTop: '10px' }}>
             <div style={lineStyle}>
-                 {/* Fill for completed steps */}
+                {/* Fill for completed steps */}
                 <div style={{ width: '50%', height: '100%', background: 'var(--vibrant-green)', borderRadius: '10px', transition: 'width 0.5s' }}></div>
             </div>
 
@@ -105,35 +108,56 @@ const GameHub: React.FC = () => {
     const { avatarId } = (location.state as { avatarId?: string }) || {};
 
     return (
-        <div className="game-hub-container" style={{ width: '100%', maxWidth: '1000px', padding: '10px' }}>
+        <div className="game-hub-container" style={{
+            height: '100vh',
+            width: '100vw',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#F0F4F8',
+            padding: '10px'
+        }}>
             {/* Header / Nav */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem', flexShrink: 0 }}>
                 <button
                     className="clay-button secondary"
-                    style={{ borderRadius: '50%', width: '50px', height: '50px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     onClick={() => navigate('/avatar-view', { state: { avatarId } })}
                 >
                     ⬅️
                 </button>
-                <div style={{ flex: 1 }}></div>
+                <div style={{ flex: 1, textAlign: 'center' }}>
+                    <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', margin: 0, color: 'var(--vibrant-purple)' }}>
+                        Game Time!
+                    </h1>
+                </div>
+                <div style={{ width: '40px' }}></div> {/* Spacer for symmetry */}
             </div>
 
-            <div className="clay-container" style={{ background: 'rgba(255,255,255,0.9)' }}>
-                
-                <ProgressBar />
+            <div className="clay-container" style={{
+                background: 'rgba(255,255,255,0.9)',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                padding: 'clamp(10px, 3vw, 20px)'
+            }}>
 
-                <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '0.5rem', color: 'var(--vibrant-purple)' }}>
-                    Game Time!
-                </h1>
-                <p style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.2rem', color: '#666' }}>
-                    Pick a game to earn treats! 🦴
-                </p>
+                <div style={{ flexShrink: 0 }}>
+                    <ProgressBar />
+                    <p style={{ textAlign: 'center', marginBottom: '1rem', fontSize: 'clamp(0.9rem, 3vw, 1.1rem)', color: '#666' }}>
+                        Pick a game to earn treats! 🦴
+                    </p>
+                </div>
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', // Responsive grid
-                    gap: '20px',
-                    padding: '10px'
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: 'clamp(8px, 2vw, 20px)',
+                    padding: '5px',
+                    overflowY: 'auto',
+                    flex: 1,
+                    alignContent: 'start' // Ensures items don't stretch to fill height if few
                 }}>
                     {MINI_GAMES.map((game) => (
                         <div
@@ -143,20 +167,21 @@ const GameHub: React.FC = () => {
                                 cursor: 'pointer',
                                 textAlign: 'center',
                                 background: `linear-gradient(135deg, white 0%, ${game.color} 100%)`,
-                                border: '3px solid white',
-                                padding: '15px 10px',
+                                border: '2px solid white',
+                                padding: 'clamp(8px, 2vw, 15px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                minHeight: '160px',
+                                aspectRatio: '1/1.1', // Maintain a nice aspect ratio
                                 position: 'relative',
-                                overflow: 'hidden'
+                                overflow: 'hidden',
+                                borderRadius: '16px'
                             }}
                             onClick={() => navigate(game.path, { state: { avatarId } })}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-10px) scale(1.05)';
-                                e.currentTarget.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
+                                e.currentTarget.style.transform = 'translateY(-5px) scale(1.03)';
+                                e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
@@ -164,33 +189,34 @@ const GameHub: React.FC = () => {
                             }}
                         >
                             <div style={{
-                                fontSize: '3rem',
-                                marginBottom: '10px',
+                                fontSize: 'clamp(2rem, 8vw, 2.5rem)',
+                                marginBottom: '5px',
                                 filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.1))',
                                 transition: 'transform 0.2s'
                             }}
-                            className="emoji-icon"
+                                className="emoji-icon"
                             >{game.emoji}</div>
 
                             <h3 style={{
-                                fontSize: '1.1rem',
-                                marginBottom: '5px',
+                                fontSize: 'clamp(0.7rem, 2.5vw, 1rem)',
+                                marginBottom: '2px',
                                 color: '#444',
-                                lineHeight: '1.2'
+                                lineHeight: '1.2',
+                                fontWeight: 800
                             }}>{game.title}</h3>
 
-                             {/* Skill Tag */}
-                             <div style={{
-                                 fontSize: '0.7rem',
-                                 background: 'rgba(255,255,255,0.6)',
-                                 padding: '4px 8px',
-                                 borderRadius: '10px',
-                                 marginTop: '5px',
-                                 fontWeight: 600,
-                                 color: '#555'
-                             }}>
-                                 {game.skills[0]}
-                             </div>
+                            {/* Skill Tag - Optional on very small screens or make very small */}
+                            <div style={{
+                                fontSize: 'clamp(0.5rem, 2vw, 0.65rem)',
+                                background: 'rgba(255,255,255,0.6)',
+                                padding: '2px 6px',
+                                borderRadius: '8px',
+                                marginTop: '2px',
+                                fontWeight: 700,
+                                color: '#666'
+                            }}>
+                                {game.skills[0]}
+                            </div>
                         </div>
                     ))}
                 </div>

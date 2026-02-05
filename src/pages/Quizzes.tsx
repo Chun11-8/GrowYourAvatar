@@ -100,28 +100,45 @@ const Quizzes: React.FC = () => {
 
     if (gameState === 'finished') {
         return (
-            <div className="quiz-game-container" style={{ background: '#FFD6A5', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="clay-container" style={{ textAlign: 'center', padding: '40px' }}>
-                    <div style={{ fontSize: '5rem', marginBottom: '20px' }}>🏆</div>
-                    <h1 style={{ color: '#2c3e50', fontSize: '3rem', marginBottom: '10px' }}>Quest Complete!</h1>
-                    <h2 style={{ color: '#4A90E2', marginBottom: '30px' }}>You Scored: {score} / {questions.length}</h2>
-                    {score >= 7 && (
-                        <button
-                            className="clay-button"
-                            onClick={() => navigate('/game-hub', { state: { avatarId } })}
-                            style={{ fontSize: '1.5rem', padding: '15px 30px', background: '#CAFFBF' }}
-                        >
-                            Adventure Complete! Proceed to next game 🏠
-                        </button>)}
-                    {score < 7 && (
-                        <button
-                            className="clay-button"
-                            onClick={() => navigate('/avatar-view')}
-                            style={{ fontSize: '1.5rem', padding: '15px 30px', background: '#CAFFBF' }}
-                        >
-                            Try Again 🏠
-                        </button>
-                    )}
+            <div className="quiz-game-container" style={{
+                background: '#FFD6A5',
+                height: '100vh',
+                width: '100vw',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                padding: '20px',
+                boxSizing: 'border-box'
+            }}>
+                <div className="clay-container" style={{
+                    textAlign: 'center',
+                    padding: 'clamp(20px, 5vw, 40px)',
+                    width: '100%',
+                    maxWidth: '500px'
+                }}>
+                    <div style={{ fontSize: 'clamp(3rem, 15vw, 5rem)', marginBottom: '10px' }}>🏆</div>
+                    <h1 style={{ color: '#2c3e50', fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', marginBottom: '10px' }}>Quest Complete!</h1>
+                    <h2 style={{ color: '#4A90E2', fontSize: 'clamp(1rem, 4vw, 1.5rem)', marginBottom: '20px' }}>You Scored: {score} / {questions.length}</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        {score >= 7 ? (
+                            <button
+                                className="clay-button"
+                                onClick={() => navigate('/game-hub', { state: { avatarId } })}
+                                style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', padding: '12px 20px', background: '#CAFFBF', width: '100%' }}
+                            >
+                                Adventure Complete! 🏠
+                            </button>
+                        ) : (
+                            <button
+                                className="clay-button"
+                                onClick={() => navigate('/avatar-view')}
+                                style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', padding: '12px 20px', background: '#CAFFBF', width: '100%' }}
+                            >
+                                Try Again 🏠
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         );
@@ -131,19 +148,41 @@ const Quizzes: React.FC = () => {
 
     return (
         <div className="quiz-game-container" style={{
-            background: '#FDCB6E', // Orange-ish yellow bg from reference
-            minHeight: '100vh',
-            padding: '20px',
-            fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif' // Kid friendly font fallback
+            background: '#FDCB6E',
+            height: '100vh',
+            width: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '15px',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            fontFamily: '"Comic Sans MS", "Chalkboard SE", sans-serif'
         }}>
             {/* Header/Progress */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', color: 'white', fontWeight: 800, fontSize: '1.2rem', textShadow: '2px 2px 0 rgba(0,0,0,0.1)' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '10px',
+                color: 'white',
+                fontWeight: 800,
+                fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                textShadow: '1px 1px 0 rgba(0,0,0,0.1)',
+                flexShrink: 0
+            }}>
                 <div>Question {currentIndex + 1}/{questions.length}</div>
                 <div>Score: {score}</div>
             </div>
 
             {/* Timer Bar */}
-            <div style={{ width: '100%', height: '20px', background: 'rgba(255,255,255,0.5)', borderRadius: '10px', marginBottom: '30px', overflow: 'hidden' }}>
+            <div style={{
+                width: '100%',
+                height: 'clamp(12px, 3vh, 18px)',
+                background: 'rgba(255,255,255,0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                overflow: 'hidden',
+                flexShrink: 0
+            }}>
                 <div style={{
                     width: `${(timeLeft / (currentQ.timer || 20)) * 100}%`,
                     height: '100%',
@@ -155,61 +194,80 @@ const Quizzes: React.FC = () => {
             {/* Question Card */}
             <div className="clay-container" style={{
                 background: 'white',
-                padding: '30px',
-                minHeight: '200px',
+                padding: 'clamp(15px, 4vw, 25px)',
+                flex: '0 1 auto',
+                minHeight: '80px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlign: 'center',
-                marginBottom: '30px',
-                position: 'relative'
+                marginBottom: '20px',
+                position: 'relative',
+                borderRadius: '20px'
             }}>
                 <div style={{
                     position: 'absolute',
-                    top: '-40px',
+                    top: '-30px',
                     background: '#54a0ff',
                     color: 'white',
-                    width: '80px',
-                    height: '80px',
+                    width: 'clamp(50px, 12vw, 70px)',
+                    height: 'clamp(50px, 12vw, 70px)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '2.5rem',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
-                    border: '5px solid white'
+                    fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                    border: '4px solid white'
                 }}>
                     ?
                 </div>
-                <h2 style={{ fontSize: '1.8rem', color: '#2d3436', marginTop: '20px' }}>{currentQ.question}</h2>
+                <h2 style={{
+                    fontSize: 'clamp(1.1rem, 4.5vw, 1.6rem)',
+                    color: '#2d3436',
+                    marginTop: '15px',
+                    lineHeight: 1.3
+                }}>
+                    {currentQ.question}
+                </h2>
             </div>
 
             {/* Feedback Message */}
-            {gameState === 'feedback' && feedback && (
-                <div style={{ textAlign: 'center', marginBottom: '20px', fontSize: '1.5rem', fontWeight: 'bold', color: feedback === 'correct' ? '#4CD137' : '#FF6B6B' }}>
-                    {feedback === 'correct' ? '🎉 Correct!' : '😢 Oops!'}
-                </div>
-            )}
+            <div style={{
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '10px',
+                flexShrink: 0
+            }}>
+                {gameState === 'feedback' && feedback && (
+                    <div style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', fontWeight: 'bold', color: feedback === 'correct' ? '#4CD137' : '#FF6B6B' }}>
+                        {feedback === 'correct' ? '🎉 Correct!' : '😢 Oops!'}
+                    </div>
+                )}
+            </div>
 
             {/* Options */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'clamp(8px, 2vh, 12px)',
+                flex: 1,
+                justifyContent: 'center'
+            }}>
                 {currentQ.options.map((opt, idx) => {
-                    // Logic for coloring buttons during feedback
-                    let bgColor = 'white'; // Default white/pastel
+                    let bgColor = 'white';
                     let borderColor = 'transparent';
 
                     if (gameState === 'feedback') {
                         if (opt === currentQ.answer) {
-                            bgColor = '#CAFFBF'; // Correct is green
+                            bgColor = '#CAFFBF';
                             borderColor = '#4CD137';
                         } else if (opt === selectedOption) {
-                            bgColor = '#FFADAD'; // Wrong selected is red
+                            bgColor = '#FFADAD';
                             borderColor = '#FF6B6B';
                         }
-                    } else {
-                        // Different colors for basic state? Or just white cards with colorful bullets?
-                        // Let's use user reference style: white bar, colored bullet/icon
-                        bgColor = 'white';
                     }
 
                     return (
@@ -222,34 +280,44 @@ const Quizzes: React.FC = () => {
                                 background: bgColor,
                                 color: '#333',
                                 textAlign: 'left',
-                                padding: '15px 20px',
-                                fontSize: '1.2rem',
+                                padding: 'clamp(10px, 2.5vh, 15px) 15px',
+                                fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 border: gameState === 'feedback' && (opt === currentQ.answer || opt === selectedOption)
-                                    ? `4px solid ${borderColor}`
-                                    : '4px solid white',
-                                transform: gameState !== 'playing' ? 'none' : undefined // disable active effect if not playing
+                                    ? `3px solid ${borderColor}`
+                                    : '3px solid white',
+                                transform: gameState !== 'playing' ? 'none' : undefined,
+                                width: '100%',
+                                boxSizing: 'border-box'
                             }}
                         >
                             <div style={{
                                 background: optionColors[idx % 4],
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '10px',
+                                width: 'clamp(30px, 8vw, 40px)',
+                                height: 'clamp(30px, 8vw, 40px)',
+                                borderRadius: '8px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                marginRight: '15px',
+                                marginRight: '12px',
                                 fontWeight: 800,
-                                fontSize: '1.2rem',
-                                color: '#555'
+                                fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
+                                color: '#555',
+                                flexShrink: 0
                             }}>
                                 {['A', 'B', 'C', 'D'][idx]}
                             </div>
-                            {opt}
-                            {gameState === 'feedback' && opt === currentQ.answer && <span style={{ marginLeft: 'auto' }}>✅</span>}
-                            {gameState === 'feedback' && opt === selectedOption && opt !== currentQ.answer && <span style={{ marginLeft: 'auto' }}>❌</span>}
+                            <span style={{
+                                flex: 1,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                            }}>
+                                {opt}
+                            </span>
+                            {gameState === 'feedback' && opt === currentQ.answer && <span style={{ marginLeft: '10px' }}>✅</span>}
+                            {gameState === 'feedback' && opt === selectedOption && opt !== currentQ.answer && <span style={{ marginLeft: '10px' }}>❌</span>}
                         </button>
                     );
                 })}

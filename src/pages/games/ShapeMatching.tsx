@@ -14,7 +14,7 @@ const ShapeMatching: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess } = useGameSession(5);
 
     const [target, setTarget] = useState(SHAPES[0]);
     const [options, setOptions] = useState<typeof SHAPES>([]);
@@ -45,105 +45,88 @@ const ShapeMatching: React.FC = () => {
 
     if (isGameOver) {
         return (
-            <div
-                className="game-container"
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    background: 'rgba(0,0,0,0.8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000,
-                    cursor: 'pointer'
-                }}
-                onClick={() => navigate('/avatar-view', { state: { avatarId } })}
-            >
+            <div className="game-container" style={{
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                zIndex: 1000, cursor: 'pointer'
+            }} onClick={() => navigate('/avatar-view', { state: { avatarId } })}>
                 <div className="clay-container" style={{
-                    background: '#fff',
-                    padding: '30px',
-                    maxWidth: '90%',
-                    width: '500px',
-                    textAlign: 'center',
-                    borderRadius: '20px',
-                    animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    background: '#fff', padding: 'clamp(20px, 5vw, 40px)', width: '90%', maxWidth: '450px',
+                    textAlign: 'center', borderRadius: '24px'
                 }}>
-                    <img
-                        src={congratulations}
-                        alt="Congratulations"
-                        style={{
-                            width: '100%',
-                            borderRadius: '15px',
-                            marginBottom: '20px',
-                            border: '4px solid #FFD1DC'
-                        }}
-                    />
-
-                    <h2 style={{ color: '#FF6B6B', fontSize: '2rem', marginBottom: '10px' }}>
-                        Congratulation! 🎉
-                    </h2>
-
-                    <p style={{ fontSize: '1.2rem', color: '#555', marginBottom: '20px', lineHeight: '1.5' }}>
-                        You have completed the mission and here is your rewards!
-                    </p>
-
-                    <div style={{ fontSize: '5rem', marginBottom: '20px', animation: 'bounce 2s infinite' }}>
-                        🍎
-                    </div>
-
-                    <p style={{ fontSize: '1rem', color: '#888' }}>
-                        (Tap anywhere to collect)
-                    </p>
+                    <img src={congratulations} alt="Congratulations" style={{ width: '100%', borderRadius: '15px', marginBottom: '15px', border: '4px solid #FFD1DC' }} />
+                    <h2 style={{ color: '#FF6B6B', fontSize: 'clamp(1.5rem, 6vw, 2.2rem)', marginBottom: '10px' }}>Well Done! 🎉</h2>
+                    <p style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: '#555', marginBottom: '15px' }}>Mission completed! Here is your reward!</p>
+                    <div style={{ fontSize: '4rem', marginBottom: '15px' }}>🍎</div>
+                    <p style={{ fontSize: '0.9rem', color: '#888' }}>(Tap to collect)</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
-            <div className="clay-container" style={{ background: '#fff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })} style={{ marginRight: 'auto' }}>← Back</button>
-                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', margin: 0, flex: 2, textAlign: 'center' }}>Shape Matcher</h2>
-                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>Round {round}/{maxRounds}</div>
+        <div className="game-container" style={{
+            height: '100vh', width: '100vw', background: '#A0C4FF', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', padding: '15px', boxSizing: 'border-box'
+        }}>
+            <div className="clay-container" style={{
+                background: '#fff', padding: 'clamp(12px, 3vw, 20px)', flex: 1,
+                display: 'flex', flexDirection: 'column', borderRadius: '24px'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
+                    <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}
+                        style={{ padding: '8px 12px', fontSize: '0.8rem' }}>← BACK</button>
+                    <h2 style={{ fontSize: 'clamp(1.1rem, 5vw, 1.6rem)', margin: 0, flex: 1, textAlign: 'center', fontWeight: 900, color: '#4A90E2' }}>SHAPE MATCHER</h2>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#666' }}>Round {round}/{maxRounds}</div>
                 </div>
 
-                <div className="score-board" style={{ fontSize: '1.5rem', margin: '1rem 0', fontWeight: 700 }}>
+                <div style={{ flexShrink: 0, textAlign: 'center', fontSize: '1.2rem', fontWeight: 800, color: '#333', marginBottom: '5px' }}>
                     Score: {score}
                 </div>
 
-                <div className="target-area" style={{
-                    padding: '2rem',
-                    background: '#f0f0f0',
-                    borderRadius: '20px',
-                    margin: '2rem auto',
-                    maxWidth: '300px',
-                    border: '5px dashed #ccc'
+                <div style={{
+                    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', margin: '5px 0'
                 }}>
-                    <div style={{ fontSize: '5rem', opacity: 0.3 }}>{target.emoji}</div>
-                    <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>{message}</p>
-                </div>
+                    <div className="target-area" style={{
+                        padding: 'clamp(20px, 5vw, 40px)',
+                        background: '#f8f9fa',
+                        borderRadius: '24px',
+                        width: 'min(70vw, 30vh)',
+                        textAlign: 'center',
+                        marginBottom: '20px',
+                        border: '5px dashed #dee2e6',
+                        flexShrink: 0
+                    }}>
+                        <div style={{ fontSize: 'clamp(4rem, 15vw, 6rem)', opacity: 0.2, margin: 0 }}>{target.emoji}</div>
+                    </div>
+                    <p style={{ fontWeight: 800, fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: '#555', textAlign: 'center', marginBottom: '20px' }}>{message}</p>
 
-                <div className="options-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '1rem',
-                    maxWidth: '400px',
-                    margin: '0 auto'
-                }}>
-                    {options.map((shape, idx) => (
-                        <button
-                            key={idx}
-                            className="clay-button"
-                            style={{ background: 'white', fontSize: '3rem', padding: '1rem' }}
-                            onClick={() => handleSelect(shape)}
-                        >
-                            {shape.emoji}
-                        </button>
-                    ))}
+                    <div className="options-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: 'clamp(15px, 4vw, 25px)',
+                        width: 'min(90vw, 45vh)'
+                    }}>
+                        {options.map((shape, idx) => (
+                            <button
+                                key={idx}
+                                className="clay-button"
+                                style={{
+                                    background: 'white',
+                                    fontSize: 'clamp(2.5rem, 10vw, 4rem)',
+                                    padding: 'clamp(15px, 4vh, 30px)',
+                                    aspectRatio: '1/1',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                onClick={() => handleSelect(shape)}
+                            >
+                                {shape.emoji}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
