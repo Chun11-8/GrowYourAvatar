@@ -5,6 +5,7 @@ export interface AvatarStats {
 }
 
 export type MoodState = 'happy' | 'sad' | 'excited' | 'sleepy';
+export type GrowthStage = 'child' | 'teen' | 'adult';
 
 export interface AvatarData {
     id: string;
@@ -18,6 +19,13 @@ export interface AvatarData {
     lastDailyUpdate?: number;
     lastPlayedAt?: number;
     quizCompleted?: boolean;
+    // Growth System
+    level: number;
+    xp: number;
+    maxXp: number;
+    stage: GrowthStage;
+    // Inventory
+    apples: number;
 }
 
 const STORAGE_KEY = 'grow_your_avatar_data';
@@ -61,23 +69,50 @@ export const createInitialStats = (): AvatarStats => ({
     mood: 5
 });
 
+export const getInitialGrowthStats = () => ({
+    level: 1,
+    xp: 0,
+    maxXp: 100,
+    stage: 'child' as GrowthStage,
+    apples: 5
+});
+
 /**
  * Handles logic for Scenario 2: Earning HP after Quiz + Game
  */
-export const completeGameSession = (avatarId: string): { rewarded: boolean } => {
+export const completeGameSession = (avatarId: string): { rewarded: boolean; leveledUp?: boolean } => {
     const avatar = getAvatarById(avatarId);
     if (!avatar) return { rewarded: false };
 
     let rewarded = false;
-    const updatedAvatar = { ...avatar };
+    let leveledUp = false;
+    let updatedAvatar = { ...avatar };
 
-    // Scenario 2: if quiz was completed, give 1 health
+    // Initialize growth stats if missing (migration)
+    if (updatedAvatar.level === undefined) {
+        Object.assign(updatedAvatar, getInitialGrowthStats());
+    }
+    // Initialize apples if missing (migration)
+    if (updatedAvatar.apples === undefined) {
+        updatedAvatar.apples = 5;
+    }
+
+    // Scenario 2: if quiz was completed, give 1 health AND XP
     if (avatar.quizCompleted) {
         updatedAvatar.stats = {
             ...avatar.stats,
             health: Math.min(5, avatar.stats.health + 1)
         };
         updatedAvatar.quizCompleted = false; // Reset for next session
+
+        // Award XP
+        const xpResult = calculateXpGain(updatedAvatar, 50); // 50 XP for completing a session
+        updatedAvatar = xpResult.avatar;
+        leveledUp = xpResult.leveledUp;
+
+        // Award Apple
+        updatedAvatar.apples = (updatedAvatar.apples || 0) + 1;
+
         rewarded = true;
     }
 
@@ -85,5 +120,46 @@ export const completeGameSession = (avatarId: string): { rewarded: boolean } => 
     updatedAvatar.lastPlayedAt = Date.now();
 
     saveAvatar(updatedAvatar);
-    return { rewarded };
+    return { rewarded, leveledUp };
+};
+
+export const addExperience = (avatarId: string, amount: number): { avatar: AvatarData | undefined, leveledUp: boolean } => {
+    const avatar = getAvatarById(avatarId);
+    if (!avatar) return { avatar: undefined, leveledUp: false };
+
+    const result = calculateXpGain(avatar, amount);
+    saveAvatar(result.avatar);
+    return { avatar: result.avatar, leveledUp: result.leveledUp };
+};
+
+// Helper to calculate XP without saving (pure-ish)
+const calculateXpGain = (avatar: AvatarData, amount: number): { avatar: AvatarData, leveledUp: boolean } => {
+    let updatedAvatar = { ...avatar };
+
+    // Safety check for migration
+    if (updatedAvatar.level === undefined) {
+        Object.assign(updatedAvatar, getInitialGrowthStats());
+    }
+
+    updatedAvatar.xp += amount;
+    let leveledUp = false;
+
+    // Level Up Loop
+    while (updatedAvatar.xp >= updatedAvatar.maxXp) {
+        updatedAvatar.xp -= updatedAvatar.maxXp;
+        updatedAvatar.level += 1;
+        updatedAvatar.maxXp = Math.floor(updatedAvatar.maxXp * 1.5); // Harder to level up
+        leveledUp = true;
+    }
+
+    // Update Stage based on Level
+    if (updatedAvatar.level >= 10) {
+        updatedAvatar.stage = 'adult';
+    } else if (updatedAvatar.level >= 5) {
+        updatedAvatar.stage = 'teen';
+    } else {
+        updatedAvatar.stage = 'child';
+    }
+
+    return { avatar: updatedAvatar, leveledUp };
 };

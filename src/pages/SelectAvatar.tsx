@@ -121,11 +121,24 @@ const SelectAvatar: React.FC = () => {
                                     border: '3px solid white',
                                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                                 }}>
-                                    <img
-                                        src={avatar.image}
-                                        alt="Avatar"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
+                                    {avatar.image ? (
+                                        <img
+                                            src={avatar.image}
+                                            alt="Avatar"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <div style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '2rem'
+                                        }}>
+                                            🐕
+                                        </div>
+                                    )}
                                 </div>
                                 <h3 style={{
                                     color: '#4A90E2',

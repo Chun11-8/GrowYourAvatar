@@ -7,6 +7,7 @@ interface GameSessionResult {
     round: number;
     maxRounds: number;
     isGameOver: boolean;
+    leveledUp: boolean; // New prop
     recordSuccess: () => void;
     recordFailure: () => void;
     resetGame: () => void;
@@ -19,13 +20,17 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
     const [score, setScore] = useState(0);
     const [round, setRound] = useState(1);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [leveledUp, setLeveledUp] = useState(false);
 
     // Scenario 2: Handle game completion rewards
     useEffect(() => {
         if (isGameOver && effectiveAvatarId) {
-            const { rewarded } = completeGameSession(effectiveAvatarId);
+            const { rewarded, leveledUp: didLevelUp } = completeGameSession(effectiveAvatarId);
             if (rewarded) {
                 console.log('Health reward granted for avatar:', effectiveAvatarId);
+            }
+            if (didLevelUp) {
+                setLeveledUp(true);
             }
         }
     }, [isGameOver, effectiveAvatarId]);
@@ -60,6 +65,7 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
         setScore(0);
         setRound(1);
         setIsGameOver(false);
+        setLeveledUp(false);
     }, []);
 
     return {
@@ -67,6 +73,7 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
         round: Math.min(round, maxRounds), // Cap display at maxRounds
         maxRounds,
         isGameOver,
+        leveledUp,
         recordSuccess,
         recordFailure,
         resetGame
