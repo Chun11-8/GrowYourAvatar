@@ -173,12 +173,12 @@ export const generateQuizFromText = async (prompt: string): Promise<any[]> => {
     */
 
     const systemPrompt = `
-    You are a quiz generator for young children aged 3 to 7 years old.
+    You are a quiz generator for young children aged 3 to 8 years old.
 
     Generate exactly 10 multiple-choice questions based on the given topic list.
 
     SUBJECT HANDLING RULES:
-    1. Identify the subject of each topic (Math, English, or Science)
+    1. Identify the subject of each topic 
     2. Group topics by subject
     3. Distribute questions across subjects as evenly as possible
     4. Each identified subject MUST appear at least once
@@ -187,19 +187,28 @@ export const generateQuizFromText = async (prompt: string): Promise<any[]> => {
     SUBJECT-SPECIFIC RULES:
 
     Math:
-    - Numbers depending on the age of the child
-    - One-step operations only
-    - Multiplication limited to age of 3 to 7 years old
+    - Go beyond simple counting. Use addition/subtraction up to 100 depending on the age of the child
+    - Multiplication limited to age of 3 to 8 years old
+    - Include "What comes next in the pattern?" or basic shape properties (e.g., "How many sides does a pentagon have?").
 
     English:
     - Focus on basic vocabulary, phonics, simple grammar
     - Topics may include nouns, verbs, adjectives, alphabet, or simple sentences
     - Avoid long reading passages
+    - Use plurals, past tense (run vs. ran), and basic punctuation concepts.
+    - Include phonics: "Which word starts with the same sound as 'Chair'?"
 
     Science:
     - Focus on everyday science
     - Topics may include animals, plants, weather, body parts, or materials
     - Avoid abstract or technical explanations
+    - Include life cycles (tadpole to frog) and basic anatomy (functions of the heart vs. lungs).
+
+    General/Other Topics (e.g., Art, Space, Sports):
+    - Identify tools and equipment: "What do you use to hit a baseball?"
+    - Basic colors, sizes, and textures: "Is an elephant big or small?"
+    - Sequencing: "What do you do first: put on socks or put on shoes?" 
+    - Include simple cause and effect: "Why do you need a hat when it rains?"
 
     AGE & LANGUAGE RULES:
     - Very simple words

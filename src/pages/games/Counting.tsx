@@ -11,7 +11,7 @@ const Counting: React.FC = () => {
     const { avatarId } = (location.state as { avatarId?: string }) || {};
     //Actual Implementation
     //const { score, round, maxRounds, isGameOver, recordSuccess, resetGame } = useGameSession(5);
-    const { score, round, maxRounds, isGameOver, recordSuccess } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess, claimReward } = useGameSession(5, avatarId);
 
     const [count, setCount] = useState(3);
     const [emoji, setEmoji] = useState('🍎');
@@ -67,7 +67,10 @@ const Counting: React.FC = () => {
                     zIndex: 1000,
                     cursor: 'pointer'
                 }}
-                onClick={() => navigate('/avatar-view', { state: { avatarId } })}
+                onClick={() => {
+                    claimReward();
+                    navigate('/avatar-view', { state: { avatarId } });
+                }}
             >
                 <div className="clay-container" style={{
                     background: '#fff',

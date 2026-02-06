@@ -7,7 +7,7 @@ const MiniSudoku: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess, claimReward } = useGameSession(5, avatarId);
     const [grid, setGrid] = useState<(number | null)[]>([]);
     const [initialIndices, setInitialIndices] = useState<number[]>([]);
 
@@ -59,7 +59,10 @@ const MiniSudoku: React.FC = () => {
                 position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
                 background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 zIndex: 1000, cursor: 'pointer'
-            }} onClick={() => navigate('/avatar-view', { state: { avatarId } })}>
+            }} onClick={() => {
+                claimReward();
+                navigate('/avatar-view', { state: { avatarId } });
+            }}>
                 <div className="clay-container" style={{
                     background: '#fff', padding: 'clamp(20px, 5vw, 40px)', width: '90%', maxWidth: '450px',
                     textAlign: 'center', borderRadius: '24px'

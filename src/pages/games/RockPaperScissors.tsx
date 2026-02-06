@@ -13,7 +13,7 @@ const RockPaperScissors: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure } = useGameSession(5);
+    const { score, round, maxRounds, isGameOver, recordSuccess, recordFailure, claimReward } = useGameSession(5, avatarId);
     const [userMove, setUserMove] = useState<any>(null);
     const [compMove, setCompMove] = useState<any>(null);
     const [result, setResult] = useState('');
@@ -42,7 +42,10 @@ const RockPaperScissors: React.FC = () => {
                 position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
                 background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 zIndex: 1000, cursor: 'pointer'
-            }} onClick={() => navigate('/avatar-view', { state: { avatarId } })}>
+            }} onClick={() => {
+                claimReward();
+                navigate('/avatar-view', { state: { avatarId } });
+            }}>
                 <div className="clay-container" style={{
                     background: '#fff', padding: 'clamp(20px, 5vw, 40px)', width: '90%', maxWidth: '450px',
                     textAlign: 'center', borderRadius: '24px'

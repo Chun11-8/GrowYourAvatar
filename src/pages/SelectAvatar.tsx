@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllAvatars, deleteAvatar, type AvatarData } from '../utils/storage';
 
 const SelectAvatar: React.FC = () => {
     const [avatars, setAvatars] = useState<AvatarData[]>([]);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deadAlertName, setDeadAlertName] = useState<string | null>(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const savedAvatars = getAllAvatars();
         setAvatars(savedAvatars);
-    }, []);
+
+        // Check for death alert from navigation state
+        const state = location.state as { deathAlert?: string };
+        if (state?.deathAlert) {
+            setDeadAlertName(state.deathAlert);
+            // Clear the state so it doesn't show again on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const handleSelect = (avatar: AvatarData) => {
+        if (avatar.isDead) return;
         navigate('/avatar-view', { state: { avatarId: avatar.id } });
     };
 
@@ -73,14 +84,15 @@ const SelectAvatar: React.FC = () => {
                                 key={avatar.id}
                                 className="clay-card"
                                 style={{
-                                    cursor: 'pointer',
+                                    cursor: avatar.isDead ? 'default' : 'pointer',
                                     textAlign: 'center',
                                     transition: 'transform 0.2s',
                                     padding: '0.6rem',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
-                                    background: 'white'
+                                    background: 'white',
+                                    filter: avatar.isDead ? 'grayscale(100%) opacity(0.8)' : 'none'
                                 }}
                                 onClick={() => handleSelect(avatar)}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
@@ -121,7 +133,19 @@ const SelectAvatar: React.FC = () => {
                                     border: '3px solid white',
                                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                                 }}>
-                                    {avatar.image ? (
+                                    {avatar.isDead ? (
+                                        <div style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '2.5rem',
+                                            background: '#ddd'
+                                        }}>
+                                            🪦
+                                        </div>
+                                    ) : avatar.image ? (
                                         <img
                                             src={avatar.image}
                                             alt="Avatar"
@@ -141,22 +165,24 @@ const SelectAvatar: React.FC = () => {
                                     )}
                                 </div>
                                 <h3 style={{
-                                    color: '#4A90E2',
+                                    color: avatar.isDead ? '#666' : '#4A90E2',
                                     fontSize: '0.75rem',
                                     marginBottom: '0.3rem',
+                                    textDecoration: avatar.isDead ? 'line-through' : 'none',
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     width: '100%'
                                 }}>
-                                    {avatar.name || avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)}
+                                    {avatar.name || avatar.style.charAt(0).toUpperCase() + avatar.style.slice(1)} {avatar.isDead && '(Gone)'}
                                 </h3>
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'center',
                                     gap: '5px',
                                     fontSize: '0.65rem',
-                                    fontWeight: 700
+                                    fontWeight: 700,
+                                    color: avatar.isDead ? '#999' : '#555'
                                 }}>
                                     <span>❤️ {avatar.stats.health}</span>
                                     <span>😊 {avatar.stats.mood}</span>
@@ -187,6 +213,41 @@ const SelectAvatar: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Death Alert Modal */}
+            {deadAlertName && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(255,107,107,0.3)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 2000
+                }}>
+                    <div className="clay-container" style={{ maxWidth: '400px', animation: 'popIn 0.4s' }}>
+                        <div className="clay-card" style={{ padding: '2.5rem', textAlign: 'center', border: '5px solid #ff6b6b' }}>
+                            <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🪦</div>
+                            <h2 style={{ color: '#d63031', marginBottom: '1rem' }}>Rest in Peace</h2>
+                            <p style={{ color: '#444', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+                                We are so sorry. <strong>{deadAlertName}</strong> has passed away because their health hit 0.
+                                <br />Remember to feed and care for your friends every day!
+                            </p>
+                            <button
+                                className="clay-button"
+                                style={{ width: '100%', backgroundColor: '#ff6b6b' }}
+                                onClick={() => setDeadAlertName(null)}
+                            >
+                                I Understand
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Custom Delete Confirmation Modal */}
             {deletingId && (

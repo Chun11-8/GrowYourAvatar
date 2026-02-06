@@ -26,6 +26,7 @@ export interface AvatarData {
     stage: GrowthStage;
     // Inventory
     apples: number;
+    isDead?: boolean;
 }
 
 const STORAGE_KEY = 'grow_your_avatar_data';
@@ -82,7 +83,9 @@ export const getInitialGrowthStats = () => ({
  */
 export const completeGameSession = (avatarId: string): { rewarded: boolean; leveledUp?: boolean } => {
     const avatar = getAvatarById(avatarId);
-    if (!avatar) return { rewarded: false };
+    if (!avatar) {
+        return { rewarded: false };
+    }
 
     let rewarded = false;
     let leveledUp = false;
@@ -97,24 +100,24 @@ export const completeGameSession = (avatarId: string): { rewarded: boolean; leve
         updatedAvatar.apples = 5;
     }
 
-    // Scenario 2: if quiz was completed, give 1 health AND XP
-    if (avatar.quizCompleted) {
-        updatedAvatar.stats = {
-            ...avatar.stats,
-            health: Math.min(5, avatar.stats.health + 1)
-        };
-        updatedAvatar.quizCompleted = false; // Reset for next session
+    // Scenario 2: Award rewards for completing game
+    // if (avatar.quizCompleted) {
+    updatedAvatar.stats = {
+        ...avatar.stats,
+        health: Math.min(5, avatar.stats.health + 1)
+    };
+    updatedAvatar.quizCompleted = false; // Reset for next session
 
-        // Award XP
-        const xpResult = calculateXpGain(updatedAvatar, 50); // 50 XP for completing a session
-        updatedAvatar = xpResult.avatar;
-        leveledUp = xpResult.leveledUp;
+    // Award XP
+    const xpResult = calculateXpGain(updatedAvatar, 50); // 50 XP for completing a session
+    updatedAvatar = xpResult.avatar;
+    leveledUp = xpResult.leveledUp;
 
-        // Award Apple
-        updatedAvatar.apples = (updatedAvatar.apples || 0) + 1;
+    // Award Apple
+    updatedAvatar.apples = (updatedAvatar.apples || 0) + 2;
 
-        rewarded = true;
-    }
+    rewarded = true;
+    // }
 
     // Mark as played to prevent Scenario 1 penalty
     updatedAvatar.lastPlayedAt = Date.now();

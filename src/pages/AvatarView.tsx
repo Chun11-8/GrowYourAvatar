@@ -41,6 +41,13 @@ const AvatarView: React.FC = () => {
     // Params from state
     const { image, style = 'voxel', name, avatarId } = (location.state as { image?: string, style?: string, name?: string, avatarId?: string }) || {};
 
+    // Persist current avatar ID for game resilience
+    useEffect(() => {
+        if (avatarId) {
+            localStorage.setItem('currentAvatarId', avatarId);
+        }
+    }, [avatarId]);
+
     const [avatar, setAvatar] = useState<AvatarData | null>(null);
     const [status, setStatus] = useState<'idle' | 'generating' | 'error'>('idle');
     const [thinkingText, setThinkingText] = useState<string | null>(null);
@@ -137,13 +144,18 @@ const AvatarView: React.FC = () => {
                     ...avatar.stats,
                     health: updatedHealth
                 },
-                lastDailyUpdate: updatedLastDailyUpdate
+                lastDailyUpdate: updatedLastDailyUpdate,
+                isDead: updatedHealth <= 0
             };
 
             setAvatar(updatedAvatar);
             saveAvatar(updatedAvatar);
+
+            if (updatedHealth <= 0) {
+                navigate('/select-avatar', { state: { deathAlert: avatar.name } });
+            }
         }
-    }, [avatar?.id]); // Only run when avatar loads or changes identity
+    }, [avatar?.id, navigate]); // Only run when avatar loads or changes identity
 
     const handleGenerateVoxel = async () => {
         if (!image || !style) return;
@@ -208,18 +220,21 @@ const AvatarView: React.FC = () => {
         let newMood: MoodState | undefined;
         let particleEmoji = '✨';
         let xpReward = 0;
+        let success = false;
 
         switch (action) {
             case 'feed':
                 // Check Inventory
                 if ((avatar.apples || 0) > 0) {
                     updatedAvatar.apples = (avatar.apples || 0) - 1;
+                    success = true;
 
                     // Heal if needed
                     if (newStats.health < 5) {
                         newStats.health = Math.min(5, newStats.health + 1);
                         newMood = 'happy';
                     }
+                    console.log('Feeding avatar:', avatar.apples);
                     // Always happy to eat
                     particleEmoji = '🍎';
                     xpReward = 30;
@@ -231,6 +246,7 @@ const AvatarView: React.FC = () => {
                 break;
             case 'rest':
                 // Always allow rest, just cap stats
+                success = true;
                 if (newStats.mana < 5) {
                     newStats.mana = Math.min(5, newStats.mana + 1);
                 }
@@ -244,6 +260,7 @@ const AvatarView: React.FC = () => {
                 if (newStats.mana > 0) {
                     newStats.mana = Math.max(0, newStats.mana - 1);
                     newStats.health = Math.min(5, newStats.health + 1);
+                    success = true;
                     newMood = 'excited';
                     particleEmoji = '💪';
                     xpReward = 10;
@@ -258,8 +275,6 @@ const AvatarView: React.FC = () => {
         updatedAvatar.stats = newStats;
         if (newMood) updatedAvatar.currentMoodState = newMood;
 
-
-
         // Apply XP Logic if reward
         if (xpReward > 0) {
             saveAvatar(updatedAvatar); // Save updates (inventory/stats) before adding XP
@@ -272,20 +287,20 @@ const AvatarView: React.FC = () => {
                     addParticles(centerX, centerY, '🆙');
                 }
             }
-        } else {
+        } else if (success) {
             saveAvatar(updatedAvatar);
         }
 
         setAvatar(updatedAvatar);
 
-        // Always notify iframe of the action's associated mood to trigger animation
+        // Always notify iframe of the action's associated mood to trigger animation if successful
         // We map action -> mood for animation purposes
         let animationMood = '';
         if (action === 'feed') animationMood = 'happy';
         if (action === 'rest') animationMood = 'sleepy';
         if (action === 'train') animationMood = 'excited';
 
-        if (animationMood && iframeRef.current?.contentWindow) {
+        if (success && animationMood && iframeRef.current?.contentWindow) {
             iframeRef.current.contentWindow.postMessage({ type: 'CHANGE_MOOD', mood: animationMood }, '*');
         }
     };
