@@ -393,10 +393,10 @@ const SelectAvatar: React.FC = () => {
 
                 {/* Bottom Action Area (Price/Select) */}
                 <div style={{
-                    padding: '20px 30px calc(env(safe-area-inset-bottom) + 20px) 30px',
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    marginBottom: '20px'
                 }}>
                     {selectedAvatar ? (
                         <button
