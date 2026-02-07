@@ -48,68 +48,93 @@ const QuizUploadSelection: React.FC = () => {
     };
 
     return (
-        <div className="page-fullscreen" style={{
-            minHeight: '100dvh',
-            width: '100%',
+        <div className="quiz-upload-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#039BE5',
             display: 'flex',
             flexDirection: 'column',
-            background: 'linear-gradient(135deg, #FFF5F5 0%, #FFF 100%)',
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            paddingLeft: 'env(safe-area-inset-left)',
-            paddingRight: 'env(safe-area-inset-right)',
-            boxSizing: 'border-box'
+            overflow: 'hidden',
+            fontFamily: '"Fredoka", sans-serif',
+            zIndex: 9999
         }}>
-            <div className="clay-container" style={{
-                flex: 1,
+            {/* Header Section (35%) */}
+            <div style={{
+                height: '35%',
                 display: 'flex',
                 flexDirection: 'column',
-                margin: '0 auto',
-                width: '100%',
-                maxWidth: '800px',
-                padding: 'clamp(1rem, 5vw, 2rem)',
-                boxSizing: 'border-box',
+                justifyContent: 'center',
+                alignItems: 'center',
                 position: 'relative',
-                background: 'rgba(255,255,255,0.5)'
+                zIndex: 1,
+                color: 'white',
+                paddingBottom: '20px',
+                backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%)',
+                backgroundColor: '#039BE5',
+                backgroundPosition: '0 0, 25px 25px',
+                backgroundSize: '50px 50px',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <button
-                        className="clay-button secondary"
-                        onClick={() => navigate(-1)}
-                        style={{ padding: '8px 16px', fontSize: '0.9rem', borderRadius: '12px' }}
-                    >
-                        ← Back
-                    </button>
-                </div>
+                <button
+                    onClick={() => navigate(-1)}
+                    style={{
+                        position: 'absolute',
+                        top: 'calc(env(safe-area-inset-top) + 20px)',
+                        left: '20px',
+                        background: 'rgba(255,255,255,0.2)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '45px',
+                        height: '45px',
+                        color: 'white',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    ⬅️
+                </button>
 
-                <div style={{
-                    textAlign: 'center',
-                    marginTop: '1rem',
-                    marginBottom: '2rem',
-                    flex: '0 0 auto'
-                }}>
-                    <div style={{
-                        fontSize: 'clamp(4rem, 15vw, 6rem)',
-                        marginBottom: '10px',
-                        filter: 'drop-shadow(0 5px 15px rgba(0,0,0,0.1))'
-                    }}>📸</div>
+                <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '5px' }}>📸</div>
                     <h1 style={{
-                        fontSize: 'clamp(2rem, 8vw, 3rem)',
-                        color: '#FFADAD',
-                        margin: '0 0 10px 0',
-                        textShadow: '2px 2px 0px rgba(0,0,0,0.05)'
-                    }}>Upload Source</h1>
-                    <p style={{
-                        fontSize: 'clamp(1rem, 4vw, 1.2rem)',
-                        color: '#7f8c8d',
-                        maxWidth: '400px',
-                        margin: '0 auto',
-                        lineHeight: 1.4
+                        margin: 0,
+                        fontSize: 'clamp(2rem, 8vw, 2.5rem)',
+                        fontWeight: 700,
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        color: 'white'
                     }}>
-                        Snap a photo or upload a file to magically create a quest!
+                        Upload Source
+                    </h1>
+                    <p style={{
+                        margin: '5px 0 0 0',
+                        fontSize: '1rem',
+                        opacity: 0.9,
+                        fontWeight: 500
+                    }}>
+                        Snap a pic or upload a file!
                     </p>
                 </div>
+            </div>
 
+            {/* Bottom Sheet (65%) */}
+            <div style={{
+                flex: 1,
+                background: '#E1F5FE',
+                borderTopLeftRadius: '35px',
+                borderTopRightRadius: '35px',
+                position: 'relative',
+                display: 'flex',
+                cursor: 'pointer',
+                flexDirection: 'column',
+                padding: '30px',
+                boxShadow: '0 -10px 30px rgba(0,0,0,0.1)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)'
+            }}>
                 {isLoading ? (
                     <div style={{
                         flex: 1,
@@ -117,73 +142,75 @@ const QuizUploadSelection: React.FC = () => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'rgba(255,255,255,0.8)',
-                        borderRadius: '20px',
-                        padding: '2rem'
+                        background: 'white',
+                        borderRadius: '25px',
+                        padding: '2rem',
+                        textAlign: 'center'
                     }}>
                         <div className="animate-bounce" style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚙️</div>
-                        <h3 style={{ fontSize: '1.5rem', color: '#555', margin: 0 }}>Analyzing Magic...</h3>
-                        <p style={{ color: '#888' }}>Extracting challenges for you...</p>
+                        <h3 style={{ fontSize: '1.5rem', color: '#546E7A', margin: '0 0 10px 0' }}>Analyzing Magic...</h3>
+                        <p style={{ color: '#78909C' }}>Extracting challenges for you...</p>
                     </div>
                 ) : (
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 'clamp(15px, 3vh, 25px)',
-                        width: '100%',
-                        maxWidth: '500px',
-                        margin: '0 auto',
-                        flex: 1,
-                        justifyContent: 'center'
+                        gap: '20px',
+                        flex: 1
                     }}>
                         {error && (
                             <div style={{
-                                color: '#ff6b6b',
-                                background: '#fff0f0',
+                                color: '#e74c3c',
+                                background: '#ffdad9',
                                 padding: '15px',
                                 borderRadius: '15px',
                                 textAlign: 'center',
+                                fontWeight: 600,
                                 border: '2px solid #ffcccc'
                             }}>
                                 ⚠️ {error}
                             </div>
                         )}
 
-                        <label className="clay-button" style={{
-                            background: '#FFADAD',
-                            color: 'white',
-                            cursor: 'pointer',
+                        <label style={{
+                            flex: 1,
+                            background: 'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%)',
+                            borderRadius: '25px',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            padding: 'clamp(20px, 5vh, 40px)',
-                            borderRadius: '25px',
+                            color: 'white',
+                            cursor: 'pointer',
+                            boxShadow: '0 10px 20px rgba(255, 154, 158, 0.3)',
                             transition: 'transform 0.2s',
-                            boxShadow: '0 10px 20px rgba(255, 173, 173, 0.3)'
+                            position: 'relative',
+                            overflow: 'hidden'
                         }}>
-                            <span style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '10px' }}>🖼️</span>
-                            <span style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', fontWeight: 800 }}>Photo Library</span>
-                            <span style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '5px' }}>From your gallery</span>
+                            <span style={{ fontSize: '3rem', marginBottom: '10px' }}>🖼️</span>
+                            <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>Photo Library</span>
+                            <span style={{ fontSize: '0.9rem', opacity: 0.9 }}>From your gallery</span>
                             <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
                         </label>
 
-                        <label className="clay-button" style={{
-                            background: '#A0C4FF',
-                            color: 'white',
-                            cursor: 'pointer',
+                        <label style={{
+                            flex: 1,
+                            background: 'linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%)',
+                            borderRadius: '25px',
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            padding: 'clamp(20px, 5vh, 40px)',
-                            borderRadius: '25px',
+                            color: 'white',
+                            cursor: 'pointer',
+                            boxShadow: '0 10px 20px rgba(161, 140, 209, 0.3)',
                             transition: 'transform 0.2s',
-                            boxShadow: '0 10px 20px rgba(160, 196, 255, 0.3)'
+                            position: 'relative',
+                            overflow: 'hidden'
                         }}>
-                            <span style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '10px' }}>📄</span>
-                            <span style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', fontWeight: 800 }}>Document</span>
-                            <span style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '5px' }}>PDF, Word, Text</span>
+                            <span style={{ fontSize: '3rem', marginBottom: '10px' }}>📄</span>
+                            <span style={{ fontSize: '1.5rem', fontWeight: 800 }}>Document</span>
+                            <span style={{ fontSize: '0.9rem', opacity: 0.9 }}>PDF, Word, Text</span>
                             <input type="file" accept=".pdf,.txt,.doc,.docx" onChange={handleFileUpload} style={{ display: 'none' }} />
                         </label>
                     </div>

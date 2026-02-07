@@ -56,87 +56,125 @@ const ManualQuizInput: React.FC = () => {
     };
 
     return (
-        <div className="quiz-input-container" style={{
-            width: '100%',
-            maxWidth: '600px',
-            padding: '10px',
-            margin: '0 auto',
-            boxSizing: 'border-box',
-            minHeight: '100vh',
+        <div className="manual-quiz-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#039BE5',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden',
+            fontFamily: '"Fredoka", sans-serif',
+            zIndex: 9999
         }}>
-            <div className="clay-container" style={{
-                background: '#f8f9fa',
-                padding: 'clamp(12px, 3vw, 20px)',
-                width: '100%',
-                boxSizing: 'border-box',
-                borderRadius: '24px',
-                flex: 1
+            {/* Header Section (35%) */}
+            <div style={{
+                height: '35%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
+                zIndex: 1,
+                color: 'white',
+                paddingBottom: '20px',
+                backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%)',
+                backgroundColor: '#039BE5',
+                backgroundPosition: '0 0, 25px 25px',
+                backgroundSize: '50px 50px',
             }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    marginBottom: '15px'
-                }}>
-                    <button
-                        className="clay-button secondary"
-                        onClick={() => navigate('/upload-quiz')}
-                        style={{ padding: '8px 12px', fontSize: '0.8rem', minWidth: 'auto' }}
-                    >
-                        ← BACK
-                    </button>
+                <button
+                    onClick={() => navigate('/upload-quiz')}
+                    style={{
+                        position: 'absolute',
+                        top: 'calc(env(safe-area-inset-top) + 20px)',
+                        left: '20px',
+                        background: 'rgba(255,255,255,0.2)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '45px',
+                        height: '45px',
+                        color: 'white',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    ⬅️
+                </button>
+
+                <div style={{ textAlign: 'center', marginTop: '10px' }}>
                     <h1 style={{
-                        fontSize: 'clamp(1.2rem, 4.5vw, 1.6rem)',
-                        color: '#4A90E2',
                         margin: 0,
-                        textAlign: 'center',
-                        flex: 1,
-                        fontWeight: 900
-                    }}>Creating Your Quest! ✍️</h1>
+                        fontSize: 'clamp(2rem, 8vw, 3rem)',
+                        fontWeight: 700,
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        color: 'white'
+                    }}>
+                        Craft Quest ✍️
+                    </h1>
+                    <p style={{
+                        margin: '5px',
+                        fontSize: '1rem',
+                        opacity: 0.9,
+                        fontWeight: 500
+                    }}>
+                        Create 10 fun questions! Teacher should be the one to create the questions.
+                    </p>
                 </div>
+            </div>
 
-                <p style={{
-                    textAlign: 'center',
-                    marginBottom: '20px',
-                    color: '#666',
-                    fontWeight: 600,
-                    fontSize: 'clamp(0.8rem, 2.5vw, 0.9rem)',
-                    lineHeight: 1.4
+            {/* Bottom Sheet (65%) */}
+            <div style={{
+                flex: 1,
+                background: '#E1F5FE',
+                borderTopLeftRadius: '35px',
+                borderTopRightRadius: '35px',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '20px',
+                boxShadow: '0 -10px 30px rgba(0,0,0,0.1)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+                overflow: 'hidden'
+            }}>
+                {/* Scrollable Content */}
+                <div style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    padding: '10px 5px 80px 5px', // Bottom padding for FAB
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px'
                 }}>
-                    Fill in <span style={{ color: '#4A90E2', fontSize: '1.2rem', fontWeight: 800 }}>10</span> fun questions for your adventure!<br />
-                    <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>(Complete all fields to proceed)</span>
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     {questions.map((q, index) => (
-                        <div key={q.id} className="clay-card" style={{
+                        <div key={q.id} style={{
                             background: 'white',
-                            padding: 'clamp(12px, 3vw, 18px)',
-                            borderLeft: '6px solid #FFD6A5',
-                            position: 'relative',
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            borderRadius: '20px'
+                            padding: '15px',
+                            borderRadius: '20px',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+                            borderLeft: '5px solid #039BE5'
                         }}>
-                            <h3 style={{ marginBottom: '10px', color: '#555', fontSize: '1rem', fontWeight: 800 }}>Question {index + 1}</h3>
+                            <h3 style={{ margin: '0 0 10px 0', color: '#546E7A', fontSize: '1rem', fontWeight: 700 }}>Question {index + 1}</h3>
                             <input
                                 type="text"
                                 placeholder="What is the question?"
                                 value={q.question}
                                 onChange={(e) => handleQuestionTextChange(q.id, e.target.value)}
-                                className="clay-input"
                                 style={{
                                     width: '100%',
-                                    padding: '10px 12px',
-                                    marginBottom: '12px',
+                                    padding: '12px',
+                                    marginBottom: '10px',
                                     borderRadius: '12px',
-                                    border: '3px solid #E0E0E0',
-                                    fontSize: '0.95rem',
+                                    border: '2px solid #E1F5FE',
+                                    background: '#F9FAFB',
+                                    fontSize: '1rem',
                                     outline: 'none',
-                                    boxSizing: 'border-box',
-                                    background: '#fff'
+                                    boxSizing: 'border-box'
                                 }}
                             />
 
@@ -152,36 +190,32 @@ const ManualQuizInput: React.FC = () => {
                                             placeholder={`Option ${optIdx + 1}`}
                                             value={opt}
                                             onChange={(e) => handleOptionChange(q.id, optIdx, e.target.value)}
-                                            className="clay-input"
                                             style={{
                                                 flex: 1,
-                                                padding: '8px 12px',
+                                                padding: '10px',
                                                 borderRadius: '10px',
-                                                border: '3px solid',
-                                                borderColor: q.answer === opt && opt !== '' ? '#4A90E2' : '#E0E0E0',
-                                                fontSize: '0.85rem',
+                                                border: '2px solid',
+                                                borderColor: q.answer === opt && opt !== '' ? '#039BE5' : '#E1F5FE',
+                                                background: q.answer === opt && opt !== '' ? '#E1F5FE' : 'white',
+                                                fontSize: '0.9rem',
                                                 outline: 'none',
-                                                background: 'white',
                                                 boxSizing: 'border-box'
                                             }}
                                         />
                                         <div
                                             onClick={() => opt.trim() !== '' && handleAnswerSelect(q.id, opt)}
                                             style={{
-                                                width: '24px',
-                                                height: '24px',
+                                                width: '30px',
+                                                height: '30px',
                                                 borderRadius: '50%',
-                                                border: '3px solid #E0E0E0',
-                                                borderColor: q.answer === opt && opt !== '' ? '#4A90E2' : '#E0E0E0',
-                                                background: q.answer === opt && opt !== '' ? '#4A90E2' : 'white',
-                                                cursor: opt.trim() === '' ? 'not-allowed' : 'pointer',
+                                                background: q.answer === opt && opt !== '' ? '#039BE5' : '#ECEFF1',
+                                                color: 'white',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                fontSize: '0.7rem',
-                                                color: 'white',
+                                                cursor: 'pointer',
                                                 flexShrink: 0,
-                                                transition: 'all 0.2s'
+                                                fontSize: '0.8rem'
                                             }}
                                         >
                                             {q.answer === opt && opt !== '' ? '✓' : ''}
@@ -193,39 +227,36 @@ const ManualQuizInput: React.FC = () => {
                     ))}
                 </div>
 
-                <button
-                    className="clay-button"
-                    style={{
-                        width: '100%',
-                        marginTop: '25px',
-                        padding: '15px',
-                        fontSize: '1.2rem',
-                        fontWeight: 900,
-                        background: '#CAFFBF',
-                        color: '#2d3436',
-                        boxShadow: '0 6px 12px rgba(0,0,0,0.1)',
-                        borderRadius: '15px'
-                    }}
-                    onClick={handleSubmit}
-                >
-                    SAVE & PLAY! 🚀
-                </button>
+                {/* Floating Submit Button */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    left: '20px',
+                    right: '20px',
+                    zIndex: 10
+                }}>
+                    <button
+                        onClick={handleSubmit}
+                        style={{
+                            width: '100%',
+                            padding: '16px',
+                            fontSize: '1.2rem',
+                            fontWeight: 700,
+                            background: '#039BE5',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '20px',
+                            boxShadow: '0 10px 20px rgba(3, 155, 229, 0.3)',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Save & Play! 🚀
+                    </button>
+                </div>
             </div>
             <style>{`
-                .clay-input:focus {
-                    border-color: #4A90E2 !important;
-                    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-                }
-                .clay-input {
-                    transition: all 0.2s ease !important;
-                }
-                @media (min-width: 480px) {
-                    .quiz-input-container {
-                        padding: 20px;
-                    }
-                    .options-grid {
-                        grid-template-columns: 1fr 1fr !important;
-                    }
+                @media (min-width: 600px) {
+                   .manual-quiz-container { max-width: 100%; margin: 0 auto; }
                 }
             `}</style>
         </div>

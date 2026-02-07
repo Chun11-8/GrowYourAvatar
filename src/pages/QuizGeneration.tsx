@@ -30,140 +30,154 @@ const QuizGeneration: React.FC = () => {
     };
 
     return (
-        <div className="page-fullscreen" style={{
-            minHeight: '100dvh',
-            width: '100%',
+        <div className="quiz-gen-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#039BE5',
             display: 'flex',
             flexDirection: 'column',
-            background: 'linear-gradient(135deg, #f8f9fa 0%, #e0f7fa 100%)',
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            paddingLeft: 'env(safe-area-inset-left)',
-            paddingRight: 'env(safe-area-inset-right)',
-            boxSizing: 'border-box'
+            overflow: 'hidden',
+            fontFamily: '"Fredoka", sans-serif',
+            zIndex: 9999
         }}>
-            <div className="clay-container" style={{
-                flex: 1,
+            {/* Header Section (35%) */}
+            <div style={{
+                height: '35%',
                 display: 'flex',
                 flexDirection: 'column',
-                margin: '0 auto',
-                width: '100%',
-                maxWidth: '800px',
-                padding: 'clamp(1rem, 5vw, 2rem)',
-                boxSizing: 'border-box',
+                justifyContent: 'center',
+                alignItems: 'center',
                 position: 'relative',
-                background: 'rgba(255,255,255,0.8)'
+                zIndex: 1,
+                color: 'white',
+                paddingBottom: '20px',
+                backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.1) 20%, transparent 20%)',
+                backgroundColor: '#039BE5',
+                backgroundPosition: '0 0, 25px 25px',
+                backgroundSize: '50px 50px',
             }}>
-                {/* Header with Back Button */}
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <button
-                        className="clay-button secondary"
-                        onClick={() => navigate(-1)}
-                        style={{
-                            padding: '8px 16px',
-                            fontSize: '0.9rem',
-                            borderRadius: '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                        }}
-                    >
-                        <span>←</span> Back
-                    </button>
-                </div>
+                <button
+                    onClick={() => navigate('/upload-quiz')}
+                    style={{
+                        position: 'absolute',
+                        top: 'calc(env(safe-area-inset-top) + 20px)',
+                        left: '20px',
+                        background: 'rgba(255,255,255,0.2)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '45px',
+                        height: '45px',
+                        color: 'white',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    ⬅️
+                </button>
 
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '1rem',
-                    flex: '0 0 auto'
-                }}>
-                    <div style={{ fontSize: 'clamp(3rem, 10vw, 4rem)', marginBottom: '0.5rem' }}>✨</div>
+                <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '5px' }}>✨</div>
                     <h1 style={{
-                        fontSize: 'clamp(1.8rem, 6vw, 2.8rem)',
-                        color: '#6ab04c',
-                        margin: '0 0 0.5rem 0',
-                        textShadow: '2px 2px 0px rgba(0,0,0,0.1)',
-                        lineHeight: 1.2
-                    }}>AI Quiz Creator</h1>
-                    <p style={{
-                        fontSize: 'clamp(0.95rem, 4vw, 1.2rem)',
-                        color: '#7f8c8d',
-                        maxWidth: '500px',
-                        margin: '0 auto',
-                        lineHeight: 1.4
+                        margin: 0,
+                        fontSize: 'clamp(2rem, 8vw, 2.5rem)',
+                        fontWeight: 700,
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        color: 'white'
                     }}>
-                        Type a topic or paste text, and AI will create the questions for you!
+                        AI Magic
+                    </h1>
+                    <p style={{
+                        margin: '5px 0 0 0',
+                        fontSize: '1rem',
+                        opacity: 0.9,
+                        fontWeight: 500
+                    }}>
+                        Prompt the AI to create a quest!
                     </p>
                 </div>
+            </div>
 
-                <div className="clay-card" style={{
+            {/* Bottom Sheet (65%) */}
+            <div style={{
+                flex: 1,
+                background: '#E1F5FE',
+                borderTopLeftRadius: '35px',
+                borderTopRightRadius: '35px',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '30px',
+                boxShadow: '0 -10px 30px rgba(0,0,0,0.1)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)'
+            }}>
+                <div style={{
                     flex: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    padding: 'clamp(1rem, 4vw, 2rem)',
-                    background: 'white',
-                    borderRadius: '24px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)'
+                    gap: '20px'
                 }}>
                     <textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Enter a topic (e.g., 'Solar System', 'Basic Math') or paste some text here..."
+                        placeholder="e.g. 'Solar System facts for kids', 'Dinosaurs', 'Math addition tables'..."
                         style={{
                             width: '100%',
                             flex: 1,
-                            minHeight: '150px',
-                            padding: '1.2rem',
-                            border: '3px solid #eee',
-                            borderRadius: '16px',
+                            padding: '20px',
+                            border: 'none',
+                            borderRadius: '25px',
                             fontSize: '1.1rem',
                             resize: 'none',
                             outline: 'none',
-                            marginBottom: '1.5rem',
                             fontFamily: 'inherit',
                             boxSizing: 'border-box',
-                            background: '#fcfcfc',
-                            transition: 'border-color 0.2s'
+                            background: 'white',
+                            boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.05)',
+                            color: '#37474F'
                         }}
-                        onFocus={(e) => e.target.style.borderColor = '#CAFFBF'}
-                        onBlur={(e) => e.target.style.borderColor = '#eee'}
                     />
 
                     {error && (
                         <div style={{
-                            color: '#ff6b6b',
-                            background: '#ffeaa7',
+                            color: '#e74c3c',
+                            background: '#ffdad9',
                             padding: '12px',
                             borderRadius: '12px',
-                            marginBottom: '1rem',
                             textAlign: 'center',
-                            fontWeight: 500
+                            fontWeight: 600
                         }}>
                             ⚠️ {error}
                         </div>
                     )}
 
                     <button
-                        className="clay-button"
                         onClick={handleGenerate}
                         disabled={isLoading || !prompt.trim()}
                         style={{
                             width: '100%',
-                            background: isLoading || !prompt.trim() ? '#eee' : '#CAFFBF',
-                            color: isLoading || !prompt.trim() ? '#aaa' : '#2d3436',
-                            fontSize: 'clamp(1.1rem, 5vw, 1.4rem)',
-                            padding: '16px',
-                            borderRadius: '16px',
-                            fontWeight: 800,
-                            boxShadow: isLoading || !prompt.trim() ? 'none' : '0 10px 20px rgba(0,255,100,0.2)',
+                            padding: '18px',
+                            fontSize: '1.3rem',
+                            fontWeight: 700,
+                            background: isLoading || !prompt.trim() ? '#B0BEC5' : '#039BE5',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '20px',
+                            boxShadow: isLoading || !prompt.trim() ? 'none' : '0 10px 20px rgba(3, 155, 229, 0.3)',
+                            cursor: isLoading || !prompt.trim() ? 'default' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
                             transition: 'all 0.2s'
                         }}
                     >
-                        {isLoading ? (
-                            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                ⚙️ Generating...
-                            </span>
-                        ) : 'Generate Quiz 🪄'}
+                        {isLoading ? '🔮 Generating...' : 'Generate Quest 🪄'}
                     </button>
                 </div>
             </div>

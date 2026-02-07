@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import landingHero from '../assets/landing-hero.png'; // Reusing the theme asset
 
 const CreateAvatar: React.FC = () => {
     const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
-import congratulations from '../../assets/congratulations.png';
+const congratulations = '/congratulations.png';
 
 const COLORS = [
     { name: 'Red', hex: '#FFADAD', emoji: '🍎' },
@@ -66,8 +66,22 @@ const ColorSorting: React.FC = () => {
 
     return (
         <div className="game-container" style={{
-            height: '100vh', width: '100vw', background: '#FDFFB6', overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', padding: '15px', boxSizing: 'border-box'
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#FDFFB6',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '15px',
+            boxSizing: 'border-box',
+            zIndex: 9999,
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
         }}>
             <div className="clay-container" style={{
                 background: '#fff', padding: 'clamp(12px, 3vw, 20px)', flex: 1,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
-import congratulations from '../../assets/congratulations.png';
+const congratulations = '/congratulations.png';
 
 const EMOJIS = ['🍎', '🐶', '🦄', '🌈', '🍦', '🧸', '🐝', '🏀'];
 
@@ -113,7 +113,24 @@ const Counting: React.FC = () => {
     }
 
     return (
-        <div className="game-container" style={{ padding: '20px', textAlign: 'center' }}>
+        <div className="game-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#FDFFB6', // Warm yellow from GameHub
+            overflow: 'auto', // Allow scrolling if needed, or hidden if fitting
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '20px',
+            boxSizing: 'border-box',
+            zIndex: 9999,
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
+        }}>
             <div className="clay-container" style={{ background: '#fff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                     <button className="clay-button secondary" onClick={() => navigate('/game-hub')} style={{ marginRight: 'auto' }}>← Back</button>

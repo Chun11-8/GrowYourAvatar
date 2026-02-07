@@ -51,12 +51,18 @@ const GameHub: React.FC = () => {
     // Let's just manually assign for perfection if needed, but this heuristic works for the demo.
 
     return (
-        <div className="page-fullscreen" style={{
-            height: '100dvh',
-            width: '100%',
+        <div className="game-hub-container" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#fffbf0', // Warm cream background
             display: 'flex',
             flexDirection: 'column',
-            background: '#fffbf0', // Warm cream background like the image
+            zIndex: 9999,
+            overflow: 'hidden',
+            fontFamily: '"Fredoka", sans-serif',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
             paddingLeft: 'env(safe-area-inset-left)',
