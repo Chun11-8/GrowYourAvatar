@@ -152,7 +152,14 @@ const AvatarView: React.FC = () => {
             saveAvatar(updatedAvatar);
 
             if (updatedHealth <= 0) {
-                navigate('/select-avatar', { state: { deathAlert: avatar.name } });
+                navigate('/select-avatar', {
+                    state: {
+                        deathAlert: {
+                            name: avatar.name,
+                            image: avatar.image
+                        }
+                    }
+                });
             }
         }
     }, [avatar?.id, navigate]); // Only run when avatar loads or changes identity
@@ -657,7 +664,10 @@ const AvatarView: React.FC = () => {
                     onClick={(e) => handleAction('train', e)}
                 />
             </div>
-        </div>
+
+
+
+        </div >
     );
 };
 
@@ -713,7 +723,8 @@ const BubbleButton = ({ icon, label, onClick, color, count }: { icon: string, la
                 fontSize: '1.8rem',
                 boxShadow: `0 6px 0 rgba(0,0,0,0.2)`,
                 color: 'white',
-                border: '2px solid white'
+                border: '2px solid white',
+                position: 'relative'
             }}>
                 {icon}
                 {count !== undefined && (

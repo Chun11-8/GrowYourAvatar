@@ -1,12 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getAllAvatars, deleteAvatar, type AvatarData } from '../utils/storage';
+import { getAllAvatars, deleteAvatar, getAvatarById, saveAvatar, createInitialStats, getInitialGrowthStats, type AvatarData } from '../utils/storage';
+
+interface DeathAlertData {
+    name: string;
+    image: string;
+}
 
 const SelectAvatar: React.FC = () => {
     const [avatars, setAvatars] = useState<AvatarData[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [deadAlertName, setDeadAlertName] = useState<string | null>(null);
+    const [deadAlert, setDeadAlert] = useState<DeathAlertData | string | null>(null);
 
     // Scroll ref to center items (optional polish)
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -24,12 +29,110 @@ const SelectAvatar: React.FC = () => {
             setSelectedId(firstAlive.id);
         }
 
-        const state = location.state as { deathAlert?: string };
+        const state = location.state as { deathAlert?: string | DeathAlertData };
         if (state?.deathAlert) {
-            setDeadAlertName(state.deathAlert);
+            setDeadAlert(state.deathAlert);
             window.history.replaceState({}, document.title);
         }
     }, [location.state]);
+
+    // ... (handlers remain same)
+
+    const renderDeathAlertContent = () => {
+        const name = typeof deadAlert === 'string' ? deadAlert : deadAlert?.name;
+        const image = typeof deadAlert === 'object' ? deadAlert?.image : null;
+
+        return (
+            <div style={{
+                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999,
+                backdropFilter: 'blur(5px)'
+            }}>
+                <div style={{
+                    background: '#E1F5FE', // Light Blue as requested
+                    padding: '40px',
+                    borderRadius: '30px',
+                    maxWidth: '85vw',
+                    width: '400px',
+                    textAlign: 'center',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                    border: '4px solid white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '20px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    {/* Header Background Decoration */}
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '100px',
+                        background: 'linear-gradient(180deg, #039BE5 0%, transparent 100%)',
+                        opacity: 0.1,
+                        zIndex: 0
+                    }}></div>
+
+                    {/* Avatar Image Circle */}
+                    <div style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        border: '5px solid white',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                        background: 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 1,
+                        overflow: 'hidden'
+                    }}>
+                        {image ? (
+                            <img src={image} alt="Dead Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)' }} />
+                        ) : (
+                            <span style={{ fontSize: '4rem' }}>🪦</span>
+                        )}
+                    </div>
+
+                    <div style={{ zIndex: 1 }}>
+                        <h2 style={{
+                            margin: 0,
+                            fontSize: '2rem',
+                            color: '#01579B',
+                            marginBottom: '10px'
+                        }}>
+                            {name} has passed away
+                        </h2>
+                        <p style={{
+                            margin: 0,
+                            color: '#455A64',
+                            fontSize: '1.1rem',
+                            lineHeight: '1.5'
+                        }}>
+                            Avatar has died due to 5 consecutive days of inactivity.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => setDeadAlert(null)}
+                        style={{
+                            padding: '15px 40px',
+                            background: '#039BE5',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '50px',
+                            fontSize: '1.2rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            boxShadow: '0 5px 15px rgba(3, 155, 229, 0.4)',
+                            transition: 'transform 0.2s',
+                            marginTop: '10px',
+                            zIndex: 1
+                        }}
+                    >
+                        Okay
+                    </button>
+                </div>
+            </div>
+        );
+    };
 
     const handleSelect = (avatar: AvatarData) => {
         if (avatar.isDead) return;
@@ -194,9 +297,9 @@ const SelectAvatar: React.FC = () => {
                 >
 
 
-                    {avatars.map(avatar => {
+                    {avatars.filter(a => !a.isDead).map(avatar => {
                         const isSelected = selectedId === avatar.id;
-                        const isDead = avatar.isDead;
+                        const isDead = avatar.isDead; // Should be false here now
 
                         return (
                             <div
@@ -222,8 +325,8 @@ const SelectAvatar: React.FC = () => {
                                         ? '0 20px 40px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                                         : '0 10px 20px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -2px rgba(0, 0, 0, 0.05)',
                                     transform: isSelected ? 'translateY(-15px)' : 'none',
-                                    opacity: isDead ? 0.7 : 1,
-                                    cursor: isDead ? 'default' : 'pointer',
+                                    opacity: 1,
+                                    cursor: 'pointer',
                                     margin: '10px 5px' // Add a little margin for spacing
                                 }}
                             >
@@ -428,19 +531,8 @@ const SelectAvatar: React.FC = () => {
             </div>
 
             {/* Modals (Death / Delete) - Simplified styles for brevity */}
-            {deadAlertName && (
-                <div style={{
-                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-                }}>
-                    <div style={{ background: 'white', padding: '30px', borderRadius: '20px', maxWidth: '300px', textAlign: 'center' }}>
-                        <h1>🪦</h1>
-                        <h2 style={{ color: '#d63031' }}>Rest in Peace</h2>
-                        <p>{deadAlertName} has passed away.</p>
-                        <button onClick={() => setDeadAlertName(null)} style={{ padding: '10px 20px', background: '#ff6b6b', color: 'white', border: 'none', borderRadius: '10px' }}>Okay</button>
-                    </div>
-                </div>
-            )}
+            {/* Death Alert Modal */}
+            {deadAlert && renderDeathAlertContent()}
 
             {deletingId && (
                 <div style={{
@@ -457,6 +549,48 @@ const SelectAvatar: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* DEBUG: Temporary Demo Button */}
+            <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999 }}>
+                <button
+                    onClick={() => {
+                        const targetId = "533xskuid";
+                        const now = Date.now();
+                        // Mock ID if needed, or update current
+                        let targetAvatar = getAvatarById(targetId) || {
+                            id: targetId,
+                            name: "Test Subject",
+                            image: "",
+                            style: "voxel",
+                            stats: createInitialStats(),
+                            ...getInitialGrowthStats(),
+                            currentMoodState: 'happy',
+                            createdAt: now
+                        } as AvatarData;
+
+                        targetAvatar.stats.health = 0; // Kill immediately
+                        targetAvatar.lastDailyUpdate = now - (25 * 60 * 60 * 1000);
+                        targetAvatar.lastPlayedAt = now - (25 * 60 * 60 * 1000);
+                        targetAvatar.isDead = true;
+
+                        saveAvatar(targetAvatar);
+
+                        // Trigger the alert manually since we are already on the page
+                        setDeadAlert({
+                            name: targetAvatar.name,
+                            image: targetAvatar.image
+                        });
+
+                        // Refresh list
+                        setAvatars(getAllAvatars());
+                    }}
+                    style={{
+                        background: 'red', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.8rem'
+                    }}
+                >
+                    💀 Kill 533x
+                </button>
+            </div>
         </div>
     );
 };
