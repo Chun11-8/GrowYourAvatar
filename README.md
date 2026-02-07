@@ -1,8 +1,12 @@
 # GrowYourAvatar 🌟
 
-**An AI-Powered Gamified Learning Platform for Children**
+**An AI-Powered Gamified Learning Platform for Children (3 to 8 years old)**
 
-GrowYourAvatar serves a dual purpose: it makes learning engaging for children through gamification and provides a customizable educational tool for parents and teachers. By linking educational progress to the growth of a personalized virtual avatar, the platform creates a compelling feedback loop that motivates consistent learning.
+GrowYourAvatar combines education and play to make learning fun, consistent, and rewarding for children. Learners grow a personalized virtual avatar by completing quizzes and educational games tailored to their level, while parents and teachers can customize content to match learning goals.
+
+To encourage daily engagement, the avatar is powered by a health system. Each day a child skips learning activities, the avatar’s health decreases by one point. By completing quizzes and playing games consecutively, children earn rewards and restore health. If the avatar’s health reaches zero, it “falls asleep” and can only be revived through learning activities—reinforcing responsibility without punishment.
+
+This design creates a meaningful feedback loop where progress, consistency, and learning directly impact the avatar’s growth, motivating children to build positive daily learning habits in a playful and engaging way.
 
 ---
 
