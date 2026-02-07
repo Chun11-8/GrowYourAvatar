@@ -28,200 +28,188 @@ export const MINI_GAMES: GameInfo[] = [
     { id: 'simon', title: 'Simon', emoji: '🔔', skills: ['Memory', 'Sequencing'], path: '/game/simon', color: '#FFDAC1' },
 ];
 
-const ProgressBar = () => {
-    // Fun chunky progress bar
-    const stepStyle: React.CSSProperties = {
-        width: '50px',
-        height: '50px',
-        borderRadius: '50%',
-        border: '4px solid white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.5rem',
-        background: '#eee',
-        position: 'relative',
-        zIndex: 2,
-        boxShadow: '0 4px 0 rgba(0,0,0,0.1)'
-    };
 
-    const activeStyle: React.CSSProperties = {
-        ...stepStyle,
-        background: 'var(--vibrant-yellow)',
-        color: 'white',
-        transform: 'scale(1.1)',
-        boxShadow: '0 6px 0 rgba(0,0,0,0.1)'
-    };
-
-    const completedStyle: React.CSSProperties = {
-        ...stepStyle,
-        background: 'var(--vibrant-green)',
-        color: 'white',
-    };
-
-    // Connecting line with stripes
-    const lineStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: '25px',
-        left: '20px',
-        right: '20px',
-        height: '10px',
-        background: 'linear-gradient(45deg, #ddd 25%, #ccc 25%, #ccc 50%, #ddd 50%, #ddd 75%, #ccc 75%, #ccc 100%)',
-        backgroundSize: '20px 20px',
-        borderRadius: '10px',
-        zIndex: 1,
-    };
-
-    return (
-        <div style={{ position: 'relative', width: '100%', maxWidth: '350px', margin: '0 auto 2rem auto', paddingTop: '10px' }}>
-            <div style={lineStyle}>
-                {/* Fill for completed steps */}
-                <div style={{ width: '50%', height: '100%', background: 'var(--vibrant-green)', borderRadius: '10px', transition: 'width 0.5s' }}></div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
-                {/* Step 1: Quiz (Done) */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={completedStyle}>📝</div>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '8px', color: 'var(--text-color)' }}>Quiz</span>
-                </div>
-
-                {/* Step 2: Game Hub (Active) */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div className="animate-bounce" style={activeStyle}>🎮</div>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '8px', color: 'var(--vibrant-blue)' }}>Games</span>
-                </div>
-
-                {/* Step 3: Flag (Pending) */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={stepStyle}>🚩</div>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '8px', color: '#aaa' }}>Goal</span>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const GameHub: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
 
+    // Group games for the "Featured" look
+    const categories = [
+        {
+            title: "Learning Basics 📚",
+            games: MINI_GAMES.filter(g => ['Counting', 'Alphabet', 'Sizes', 'Colors', 'Shapes'].some(k => g.title.includes(k) || g.skills.includes(k)))
+        },
+        {
+            title: "Brain Power 🧠",
+            games: MINI_GAMES.filter(g => !['Counting', 'Alphabet', 'Sizes', 'Colors', 'Shapes', 'Sound'].some(k => g.title.includes(k) || g.skills.includes(k)))
+        }
+    ];
+
+    // Catch any missing ones? For now, this is a simple filter. 
+    // Let's just manually assign for perfection if needed, but this heuristic works for the demo.
+
     return (
-        <div className="game-hub-container" style={{
-            height: '100vh',
-            width: '100vw',
-            overflow: 'hidden',
+        <div className="page-fullscreen" style={{
+            height: '100dvh',
+            width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            background: '#F0F4F8',
-            padding: '10px'
+            background: '#fffbf0', // Warm cream background like the image
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
+            boxSizing: 'border-box'
         }}>
-            {/* Header / Nav */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem', flexShrink: 0 }}>
+            {/* Minimal Header */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '15px 20px',
+                background: 'transparent',
+                flexShrink: 0
+            }}>
                 <button
-                    className="clay-button secondary"
-                    style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     onClick={() => navigate('/avatar-view', { state: { avatarId } })}
+                    style={{
+                        position: 'absolute',
+                        left: '20px',
+                        background: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        width: '40px',
+                        height: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                        cursor: 'pointer'
+                    }}
                 >
                     ⬅️
                 </button>
-                <div style={{ flex: 1, textAlign: 'center' }}>
-                    <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', margin: 0, color: 'var(--vibrant-purple)' }}>
-                        Game Time!
-                    </h1>
-                </div>
-                <div style={{ width: '40px' }}></div> {/* Spacer for symmetry */}
-            </div>
-
-            <div className="clay-container" style={{
-                background: 'rgba(255,255,255,0.9)',
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                padding: 'clamp(10px, 3vw, 20px)'
-            }}>
-
-                <div style={{ flexShrink: 0 }}>
-                    <ProgressBar />
-                    <p style={{ textAlign: 'center', marginBottom: '1rem', fontSize: 'clamp(0.9rem, 3vw, 1.1rem)', color: '#666' }}>
-                        Pick a game to earn treats! 🦴
-                    </p>
-                </div>
-
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 'clamp(8px, 2vw, 20px)',
-                    padding: '5px',
-                    overflowY: 'auto',
-                    flex: 1,
-                    alignContent: 'start' // Ensures items don't stretch to fill height if few
+                <h1 style={{
+                    fontSize: '1.2rem',
+                    color: '#333',
+                    margin: 0,
+                    fontWeight: 600,
+                    letterSpacing: '0.5px'
                 }}>
-                    {MINI_GAMES.map((game) => (
-                        <div
-                            key={game.id}
-                            className="clay-card"
-                            style={{
-                                cursor: 'pointer',
-                                textAlign: 'center',
-                                background: `linear-gradient(135deg, white 0%, ${game.color} 100%)`,
-                                border: '2px solid white',
-                                padding: 'clamp(8px, 2vw, 15px)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                aspectRatio: '1/1.1', // Maintain a nice aspect ratio
-                                position: 'relative',
-                                overflow: 'hidden',
-                                borderRadius: '16px'
-                            }}
-                            onClick={() => navigate(game.path, { state: { avatarId } })}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-5px) scale(1.03)';
-                                e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                                e.currentTarget.style.boxShadow = '';
-                            }}
-                        >
-                            <div style={{
-                                fontSize: 'clamp(2rem, 8vw, 2.5rem)',
-                                marginBottom: '5px',
-                                filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.1))',
-                                transition: 'transform 0.2s'
-                            }}
-                                className="emoji-icon"
-                            >{game.emoji}</div>
-
-                            <h3 style={{
-                                fontSize: 'clamp(0.7rem, 2.5vw, 1rem)',
-                                marginBottom: '2px',
-                                color: '#444',
-                                lineHeight: '1.2',
-                                fontWeight: 800
-                            }}>{game.title}</h3>
-
-                            {/* Skill Tag - Optional on very small screens or make very small */}
-                            <div style={{
-                                fontSize: 'clamp(0.5rem, 2vw, 0.65rem)',
-                                background: 'rgba(255,255,255,0.6)',
-                                padding: '2px 6px',
-                                borderRadius: '8px',
-                                marginTop: '2px',
-                                fontWeight: 700,
-                                color: '#666'
-                            }}>
-                                {game.skills[0]}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                    Game Center
+                </h1>
             </div>
-        </div >
+
+            {/* Scrollable Content */}
+            <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '0 20px 20px 20px'
+            }}>
+                {/* Featured / Progress Banner */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: '24px',
+                    padding: '20px',
+                    marginBottom: '20px',
+                    boxShadow: '0 5px 15px rgba(0,0,0,0.03)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <div>
+                        <h3 style={{ margin: '0 0 5px 0', color: '#2d3436' }}>Ready to play?</h3>
+                        <p style={{ margin: 0, color: '#b2bec3', fontSize: '0.9rem' }}>Earn treats for your avatar! 🦴</p>
+                    </div>
+                    <div style={{ fontSize: '2.5rem' }}>🐕</div>
+                </div>
+
+                {categories.map((cat, idx) => (
+                    <div key={idx} style={{ marginBottom: '25px' }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '15px'
+                        }}>
+                            <h2 style={{
+                                fontSize: '1.1rem',
+                                color: '#2d3436',
+                                margin: 0,
+                                fontWeight: 700
+                            }}>{cat.title}</h2>
+                            <span style={{ fontSize: '0.9rem', color: '#b2bec3' }}>More</span>
+                        </div>
+
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gap: '15px',
+                        }}>
+                            {cat.games.map((game) => (
+                                <div
+                                    key={game.id}
+                                    onClick={() => navigate(game.path, { state: { avatarId } })}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    {/* Icon Container */}
+                                    <div style={{
+                                        width: '100%',
+                                        aspectRatio: '1/1',
+                                        background: game.color || '#eee',
+                                        borderRadius: '22px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '2.5rem',
+                                        boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+                                        transition: 'transform 0.1s',
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                    }}>
+                                        {/* Subtle Shine Effect */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
+                                            pointerEvents: 'none'
+                                        }}></div>
+                                        <span style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>
+                                            {game.emoji}
+                                        </span>
+                                    </div>
+
+                                    {/* Text */}
+                                    <span style={{
+                                        fontSize: '0.9rem',
+                                        color: '#555',
+                                        fontWeight: 600,
+                                        textAlign: 'center',
+                                        lineHeight: 1.2
+                                    }}>
+                                        {game.title}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
+        </div>
     );
 };
 

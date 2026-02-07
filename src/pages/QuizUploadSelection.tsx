@@ -48,47 +48,146 @@ const QuizUploadSelection: React.FC = () => {
     };
 
     return (
-        <div className="upload-quiz-container" style={{ width: '100%', maxWidth: '800px', padding: '20px' }}>
-            <div className="clay-container" style={{ position: 'relative', background: '#f8f9fa' }}>
-                <button
-                    className="clay-button secondary"
-                    onClick={() => navigate(-1)}
-                    style={{ position: 'absolute', top: '20px', left: '20px' }}
-                >
-                    ← Back
-                </button>
-
-                <div style={{ textAlign: 'center', marginTop: '60px' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '10px' }}>📸</div>
-                    <h1 style={{ fontSize: '2.5rem', color: '#FFADAD', marginBottom: '10px' }}>Upload Material</h1>
-                    <p style={{ fontSize: '1.2rem', color: '#7f8c8d', marginBottom: '40px' }}>
-                        Upload a photo of a worksheet, book page, or a document file.
-                    </p>
-
-                    {isLoading ? (
-                        <div style={{ padding: '40px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '20px' }}>⚙️</div>
-                            <h3>Analyzing Document...</h3>
-                            <p>Extracting questions for you...</p>
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', margin: '0 auto' }}>
-                            {error && <div style={{ color: '#ff6b6b', background: 'white', padding: '10px', borderRadius: '10px' }}>{error}</div>}
-
-                            <label className="clay-button" style={{ background: '#FFADAD', color: 'white', cursor: 'pointer', display: 'block', padding: '20px' }}>
-                                <span style={{ display: 'block', fontSize: '2rem', marginBottom: '5px' }}>🖼️</span>
-                                <span style={{ fontSize: '1.2rem' }}>Pick Image from Gallery</span>
-                                <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
-                            </label>
-
-                            <label className="clay-button" style={{ background: '#A0C4FF', color: 'white', cursor: 'pointer', display: 'block', padding: '20px' }}>
-                                <span style={{ display: 'block', fontSize: '2rem', marginBottom: '5px' }}>📄</span>
-                                <span style={{ fontSize: '1.2rem' }}>Upload Document (PDF/Text)</span>
-                                <input type="file" accept=".pdf,.txt,.doc,.docx" onChange={handleFileUpload} style={{ display: 'none' }} />
-                            </label>
-                        </div>
-                    )}
+        <div className="page-fullscreen" style={{
+            minHeight: '100dvh',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'linear-gradient(135deg, #FFF5F5 0%, #FFF 100%)',
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
+            boxSizing: 'border-box'
+        }}>
+            <div className="clay-container" style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '0 auto',
+                width: '100%',
+                maxWidth: '800px',
+                padding: 'clamp(1rem, 5vw, 2rem)',
+                boxSizing: 'border-box',
+                position: 'relative',
+                background: 'rgba(255,255,255,0.5)'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <button
+                        className="clay-button secondary"
+                        onClick={() => navigate(-1)}
+                        style={{ padding: '8px 16px', fontSize: '0.9rem', borderRadius: '12px' }}
+                    >
+                        ← Back
+                    </button>
                 </div>
+
+                <div style={{
+                    textAlign: 'center',
+                    marginTop: '1rem',
+                    marginBottom: '2rem',
+                    flex: '0 0 auto'
+                }}>
+                    <div style={{
+                        fontSize: 'clamp(4rem, 15vw, 6rem)',
+                        marginBottom: '10px',
+                        filter: 'drop-shadow(0 5px 15px rgba(0,0,0,0.1))'
+                    }}>📸</div>
+                    <h1 style={{
+                        fontSize: 'clamp(2rem, 8vw, 3rem)',
+                        color: '#FFADAD',
+                        margin: '0 0 10px 0',
+                        textShadow: '2px 2px 0px rgba(0,0,0,0.05)'
+                    }}>Upload Source</h1>
+                    <p style={{
+                        fontSize: 'clamp(1rem, 4vw, 1.2rem)',
+                        color: '#7f8c8d',
+                        maxWidth: '400px',
+                        margin: '0 auto',
+                        lineHeight: 1.4
+                    }}>
+                        Snap a photo or upload a file to magically create a quest!
+                    </p>
+                </div>
+
+                {isLoading ? (
+                    <div style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(255,255,255,0.8)',
+                        borderRadius: '20px',
+                        padding: '2rem'
+                    }}>
+                        <div className="animate-bounce" style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚙️</div>
+                        <h3 style={{ fontSize: '1.5rem', color: '#555', margin: 0 }}>Analyzing Magic...</h3>
+                        <p style={{ color: '#888' }}>Extracting challenges for you...</p>
+                    </div>
+                ) : (
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'clamp(15px, 3vh, 25px)',
+                        width: '100%',
+                        maxWidth: '500px',
+                        margin: '0 auto',
+                        flex: 1,
+                        justifyContent: 'center'
+                    }}>
+                        {error && (
+                            <div style={{
+                                color: '#ff6b6b',
+                                background: '#fff0f0',
+                                padding: '15px',
+                                borderRadius: '15px',
+                                textAlign: 'center',
+                                border: '2px solid #ffcccc'
+                            }}>
+                                ⚠️ {error}
+                            </div>
+                        )}
+
+                        <label className="clay-button" style={{
+                            background: '#FFADAD',
+                            color: 'white',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'clamp(20px, 5vh, 40px)',
+                            borderRadius: '25px',
+                            transition: 'transform 0.2s',
+                            boxShadow: '0 10px 20px rgba(255, 173, 173, 0.3)'
+                        }}>
+                            <span style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '10px' }}>🖼️</span>
+                            <span style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', fontWeight: 800 }}>Photo Library</span>
+                            <span style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '5px' }}>From your gallery</span>
+                            <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+                        </label>
+
+                        <label className="clay-button" style={{
+                            background: '#A0C4FF',
+                            color: 'white',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 'clamp(20px, 5vh, 40px)',
+                            borderRadius: '25px',
+                            transition: 'transform 0.2s',
+                            boxShadow: '0 10px 20px rgba(160, 196, 255, 0.3)'
+                        }}>
+                            <span style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '10px' }}>📄</span>
+                            <span style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', fontWeight: 800 }}>Document</span>
+                            <span style={{ fontSize: '0.9rem', opacity: 0.9, marginTop: '5px' }}>PDF, Word, Text</span>
+                            <input type="file" accept=".pdf,.txt,.doc,.docx" onChange={handleFileUpload} style={{ display: 'none' }} />
+                        </label>
+                    </div>
+                )}
             </div>
         </div>
     );
