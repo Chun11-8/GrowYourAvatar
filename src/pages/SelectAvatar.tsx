@@ -12,6 +12,7 @@ const SelectAvatar: React.FC = () => {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [deadAlert, setDeadAlert] = useState<DeathAlertData | string | null>(null);
+    const [showRules, setShowRules] = useState(false);
 
     // Scroll ref to center items (optional polish)
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -232,36 +233,52 @@ const SelectAvatar: React.FC = () => {
                     ⬅️
                 </button>
 
-                {/* Top User Mock (from reference) */}
-                <div style={{
+            </div>
+
+            {/* Activity Rules Icon */}
+            <button
+                onClick={() => setShowRules(true)}
+                style={{
                     position: 'absolute',
                     top: 'calc(env(safe-area-inset-top) + 20px)',
                     right: '20px',
+                    background: 'rgba(255,255,255,0.2)',
+                    border: '2px solid rgba(255,255,255,0.5)',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    color: 'white',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
                     display: 'flex',
-                    gap: '10px'
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10
+                }}
+            >
+                ?
+            </button>
+
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <h1 style={{
+                    margin: 0,
+                    fontSize: 'clamp(1.8rem, 6vw, 2.5rem)',
+                    fontWeight: 700,
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    color: 'white'
                 }}>
-
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <h1 style={{
-                        margin: 0,
-                        fontSize: 'clamp(1.8rem, 6vw, 2.5rem)',
-                        fontWeight: 700,
-                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                        color: 'white'
-                    }}>
-                        Hand-pick Your<br />Character
-                    </h1>
-                    <div style={{
-                        width: '40px',
-                        height: '4px',
-                        background: 'rgba(255,255,255,0.5)',
-                        margin: '10px auto',
-                        borderRadius: '2px'
-                    }}></div>
-                </div>
+                    Hand-pick Your<br />Character
+                </h1>
+                <div style={{
+                    width: '40px',
+                    height: '4px',
+                    background: 'rgba(255,255,255,0.5)',
+                    margin: '10px auto',
+                    borderRadius: '2px'
+                }}></div>
             </div>
+
 
             {/* Bottom Sheet */}
             <div style={{
@@ -530,7 +547,139 @@ const SelectAvatar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Modals (Death / Delete) - Simplified styles for brevity */}
+            {/* Modals (Death / Delete) - Simplified styles for brevity */} {/* Activity Rules Modal */}
+            {
+                showRules && (
+                    <div style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000,
+                        backdropFilter: 'blur(3px)'
+                    }}>
+                        <div style={{
+                            background: '#FFF3E0', // Light Orange-ish background for contrast inside, or stick to light blue? User asked for Light Blue theme.
+                            // Let's go with a Light Blue theme as requested:
+                            backgroundColor: '#E1F5FE',
+                            padding: '0', // Reset padding for custom header
+                            borderRadius: '25px',
+                            maxWidth: '90vw',
+                            width: '380px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            border: '6px solid #B3E5FC',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setShowRules(false)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    right: '10px',
+                                    background: '#FF7043',
+                                    border: '2px solid white',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '1.2rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    zIndex: 10,
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                }}
+                            >
+                                ✕
+                            </button>
+
+                            {/* Ribbon Header */}
+                            <div style={{
+                                background: 'linear-gradient(180deg, #0288D1 0%, #0277BD 100%)',
+                                color: 'white',
+                                padding: '10px 40px',
+                                borderRadius: '0 0 10px 10px',
+                                fontWeight: 'bold',
+                                fontSize: '1.3rem',
+                                marginBottom: '20px',
+                                boxShadow: '0 4px 0 rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.1)',
+                                zIndex: 1,
+                                position: 'relative',
+                                top: '-2px' // slight overlap
+                            }}>
+                                Activity Rules
+                            </div>
+
+                            {/* Content Area */}
+                            <div style={{
+                                padding: '0 30px 30px 30px',
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '15px'
+                            }}>
+                                {[
+                                    "Each day avatar will deduct 1 health point at 12am.",
+                                    "When health point reaches 0, avatar will die.",
+                                    "The avatar will grow and gain experience point when eat apple.",
+                                    "You must get 7 out of 10 questions correct to proceed to gamehub.",
+                                    "Completing quiz and game will earn treats like 2 apples.",
+                                ].map((rule, index) => (
+                                    <div key={index} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '15px',
+                                        color: '#546E7A',
+                                        fontSize: '1rem',
+                                        fontWeight: 500,
+                                        textAlign: 'left'
+                                    }}>
+                                        <div style={{
+                                            flexShrink: 0,
+                                            width: '28px',
+                                            height: '28px',
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #FF7043 0%, #F4511E 100%)', // Red/Orange badge for contrast
+                                            color: 'white',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.9rem',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                        }}>
+                                            {index + 1}
+                                        </div>
+                                        <span>{rule}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Bottom Button */}
+                            <button
+                                onClick={() => setShowRules(false)}
+                                style={{
+                                    margin: '0 0 30px 0',
+                                    padding: '12px 60px',
+                                    background: 'linear-gradient(180deg, #FFCA28 0%, #FFB300 100%)', // Gold button
+                                    color: '#5D4037',
+                                    border: '2px solid #FFE082',
+                                    borderRadius: '50px',
+                                    fontSize: '1.1rem',
+                                    fontWeight: 800,
+                                    cursor: 'pointer',
+                                    boxShadow: '0 6px 0 #FF6F00, 0 10px 10px rgba(0,0,0,0.2)', // 3D effect
+                                    transition: 'transform 0.1s',
+                                }}
+                            >
+                                I Know
+                            </button>
+                        </div>
+                    </div>
+                )}
+
             {/* Death Alert Modal */}
             {deadAlert && renderDeathAlertContent()}
 
