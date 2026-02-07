@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { soundManager } from '../utils/SoundManager';
 
 export interface GameInfo {
     id: string;
@@ -28,12 +29,31 @@ export const MINI_GAMES: GameInfo[] = [
     { id: 'simon', title: 'Simon', emoji: '🔔', skills: ['Memory', 'Sequencing'], path: '/game/simon', color: '#FFDAC1' },
 ];
 
-
-
 const GameHub: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
+    const [isMuted, setIsMuted] = useState(soundManager.isAudioMuted());
+
+    useEffect(() => {
+        // BGM removed per user request
+    }, [isMuted]);
+
+    const toggleMute = () => {
+        const newState = !isMuted;
+        setIsMuted(newState);
+        soundManager.setMute(newState);
+    };
+
+    const handleGameClick = (path: string) => {
+        soundManager.playClick();
+        navigate(path, { state: { avatarId } });
+    };
+
+    const handleBack = () => {
+        soundManager.playClick();
+        navigate('/avatar-view', { state: { avatarId } });
+    };
 
     // Group games for the "Featured" look
     const categories = [
@@ -46,9 +66,6 @@ const GameHub: React.FC = () => {
             games: MINI_GAMES.filter(g => !['Counting', 'Alphabet', 'Sizes', 'Colors', 'Shapes', 'Sound'].some(k => g.title.includes(k) || g.skills.includes(k)))
         }
     ];
-
-    // Catch any missing ones? For now, this is a simple filter. 
-    // Let's just manually assign for perfection if needed, but this heuristic works for the demo.
 
     return (
         <div className="game-hub-container" style={{
@@ -76,10 +93,11 @@ const GameHub: React.FC = () => {
                 justifyContent: 'center',
                 padding: '15px 20px',
                 background: 'transparent',
-                flexShrink: 0
+                flexShrink: 0,
+                position: 'relative'
             }}>
                 <button
-                    onClick={() => navigate('/avatar-view', { state: { avatarId } })}
+                    onClick={handleBack}
                     style={{
                         position: 'absolute',
                         left: '20px',
@@ -107,6 +125,29 @@ const GameHub: React.FC = () => {
                 }}>
                     Game Center
                 </h1>
+
+                {/* Audio Toggle */}
+                <button
+                    onClick={toggleMute}
+                    style={{
+                        position: 'absolute',
+                        right: '20px',
+                        background: isMuted ? '#fab1a0' : '#55efc4',
+                        border: 'none',
+                        borderRadius: '12px',
+                        width: '40px',
+                        height: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                        cursor: 'pointer',
+                        transition: 'background 0.3s'
+                    }}
+                >
+                    {isMuted ? '🔇' : '🎵'}
+                </button>
             </div>
 
             {/* Scrollable Content */}
@@ -158,7 +199,7 @@ const GameHub: React.FC = () => {
                             {cat.games.map((game) => (
                                 <div
                                     key={game.id}
-                                    onClick={() => navigate(game.path, { state: { avatarId } })}
+                                    onClick={() => handleGameClick(game.path)}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -213,8 +254,6 @@ const GameHub: React.FC = () => {
                     </div>
                 ))}
             </div>
-
-
         </div>
     );
 };

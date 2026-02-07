@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { completeGameSession } from '../utils/storage';
+import { soundManager } from '../utils/SoundManager';
 
 interface GameSessionResult {
     score: number;
@@ -29,6 +30,9 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
             const { leveledUp: didLevelUp } = completeGameSession(effectiveAvatarId);
             if (didLevelUp) {
                 setLeveledUp(true);
+                soundManager.playLevelUp();
+            } else {
+                soundManager.playClick(); // Feedback for claiming
             }
         }
     }, [effectiveAvatarId]);
@@ -36,6 +40,7 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
     const checkGameOver = useCallback((currentRound: number) => {
         if (currentRound > maxRounds) {
             setIsGameOver(true);
+            soundManager.playWin(); // Session complete fanfare
             return true;
         }
         return false;
@@ -44,6 +49,7 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
     const recordSuccess = useCallback(() => {
         if (isGameOver) return;
 
+        soundManager.playCorrect();
         setScore(prev => prev + 1);
         const nextRound = round + 1;
         setRound(nextRound);
@@ -53,6 +59,7 @@ export const useGameSession = (maxRounds: number = 5, avatarId?: string): GameSe
     const recordFailure = useCallback(() => {
         if (isGameOver) return;
 
+        soundManager.playWrong();
         // Score doesn't increase, but round does
         const nextRound = round + 1;
         setRound(nextRound);

@@ -29,12 +29,14 @@ import QuizGeneration from './pages/QuizGeneration';
 import QuizUploadSelection from './pages/QuizUploadSelection';
 import QuizReview from './pages/QuizReview';
 import Quizzes from './pages/Quizzes';
+import SoundTest from './pages/SoundTest';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/sound-test" element={<SoundTest />} />
         <Route path="/select-avatar" element={<SelectAvatar />} />
         <Route path="/create-avatar" element={<CreateAvatar />} />
         <Route path="/avatar-view" element={<AvatarView />} />
