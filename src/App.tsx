@@ -31,7 +31,13 @@ import QuizReview from './pages/QuizReview';
 import Quizzes from './pages/Quizzes';
 import SoundTest from './pages/SoundTest';
 
+import { useEffect } from 'react';
+import { soundManager } from './utils/SoundManager';
+
 const App: React.FC = () => {
+  useEffect(() => {
+    soundManager.playBackgroundMusic();
+  }, []);
   return (
     <Router>
       <Routes>

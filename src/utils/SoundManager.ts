@@ -12,21 +12,26 @@
  * - playGameOver(): Descending sad tones
  */
 
+import backgroundMusicAsset from '../assets/backgroundKid.mp3';
+
 class SoundManager {
     private audioCtx: AudioContext | null = null;
     private isMuted: boolean = false;
-    private bgmOscillators: OscillatorNode[] = [];
-    private bgmGain: GainNode | null = null;
+    private bgMusic: HTMLAudioElement | null = null;
 
     constructor() {
-        // Initialize AudioContext lazily on first user interaction if possible
-        // but here we prepare it. Browsers require user gesture to resume.
+        // Initialize AudioContext lazily
         try {
             const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
             this.audioCtx = new AudioContextClass();
         } catch (e) {
             console.error("Web Audio API not supported", e);
         }
+
+        // Initialize Background Music
+        this.bgMusic = new Audio(backgroundMusicAsset);
+        this.bgMusic.loop = true;
+        this.bgMusic.volume = 0.5; // Set a reasonable default volume
     }
 
     private getContext(): AudioContext | null {
@@ -39,11 +44,16 @@ class SoundManager {
 
     public setMute(mute: boolean) {
         this.isMuted = mute;
-        if (mute) {
-            this.stopBackgroundMusic();
-        } else {
-            // Optionally restart music if it was supposed to be playing?
-            // For now, let's just stop it to be safe.
+        if (this.bgMusic) {
+            if (mute) {
+                this.bgMusic.pause();
+            } else {
+                // Only resume if it was intended to be playing.
+                // For simplicity in this app, we'll assume unmuting tries to play if we are in a "playing" state,
+                // but simpler is just to let the play functions handle it.
+                // However, commonly users expect unmuting to resume music.
+                this.bgMusic.play().catch(e => console.log("Playback failed:", e));
+            }
         }
     }
 
@@ -51,23 +61,28 @@ class SoundManager {
         return this.isMuted;
     }
 
-    // --- Background Music (Removed) ---
+    // --- Background Music ---
 
     public playBackgroundMusic() {
-        // Removed per user request
+        if (this.isMuted || !this.bgMusic) return;
+
+        this.bgMusic.play().catch(e => {
+            console.log("Autoplay prevented. Music will start on user interaction.", e);
+            // Optional: Listen for the next click to start music
+            const playOnInteraction = () => {
+                this.bgMusic?.play();
+                window.removeEventListener('click', playOnInteraction);
+                window.removeEventListener('keydown', playOnInteraction);
+            };
+            window.addEventListener('click', playOnInteraction);
+            window.addEventListener('keydown', playOnInteraction);
+        });
     }
 
     public stopBackgroundMusic() {
-        this.bgmOscillators.forEach(osc => {
-            try {
-                osc.stop();
-                osc.disconnect();
-            } catch (e) { /* ignore */ }
-        });
-        this.bgmOscillators = [];
-        if (this.bgmGain) {
-            this.bgmGain.disconnect();
-            this.bgmGain = null;
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+            this.bgMusic.currentTime = 0;
         }
     }
 
