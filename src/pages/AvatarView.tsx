@@ -107,6 +107,7 @@ const AvatarView: React.FC = () => {
                 setAvatar(saved);
                 // Refresh the active ID
                 localStorage.setItem('lastActiveAvatarId', saved.id);
+                localStorage.setItem('currentAvatarId', saved.id); // Fix: Sync current ID 
                 return;
             }
         }
@@ -188,7 +189,10 @@ const AvatarView: React.FC = () => {
 
             setAvatar(newAvatar);
             saveAvatar(newAvatar);
+            setAvatar(newAvatar);
+            saveAvatar(newAvatar);
             localStorage.setItem('lastActiveAvatarId', newAvatar.id);
+            localStorage.setItem('currentAvatarId', newAvatar.id); // Fix: Ensure game session uses new ID
             setStatus('idle');
             setThinkingText(null);
         } catch (err: any) {

@@ -77,7 +77,7 @@ export const generateImage = async (prompt: string, optimize: boolean = true): P
         }
 
         const result = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
             config: {
                 responseMimeType: "image/png",
@@ -111,7 +111,7 @@ export const generateVoxelScene = async (
 
     try {
         const result = await ai.models.generateContentStream({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: [
                 {
                     role: "user",
@@ -234,15 +234,16 @@ export const generateQuizFromText = async (prompt: string): Promise<any[]> => {
 
     try {
         const result = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
             config: {
                 responseMimeType: "application/json",
             },
         } as any);
 
-        const text = (result as any).candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) throw new Error("No quiz generated.");
+        const textRaw = (result as any).candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!textRaw) throw new Error("No quiz generated.");
+        const text = textRaw.replace(/```json/g, '').replace(/```/g, '').trim();
         return JSON.parse(text);
     } catch (error) {
         console.error("Quiz generation failed:", error);
@@ -257,17 +258,23 @@ export const generateQuizFromImage = async (imageBase64: string): Promise<any[]>
 
     const systemPrompt = `
     Analyze this image/document. Extract key information and generate 10 multiple-choice questions based on it.
-    Return the result strictly as a valid JSON array of objects.
+    
+    CRITICAL OUTPUT RULES:
+    - Output ONLY valid JSON.
+    - No markdown blocks (e.g. \`\`\`json), no comments, no explanations.
+    - No trailing commas.
+    - Single JSON array of objects.
+    
     Each object must have:
-    - id: string (unique)
-    - question: string
-    - options: string[] (array of 4 distinct answers)
-    - answer: string (the correct answer, must be exactly one of the options)
+    - "id": string (unique)
+    - "question": string
+    - "options": string[] (array of 4 distinct answers)
+    - "answer": string (the correct answer, must be exactly one of the options)
     `;
 
     try {
         const result = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: [
                 {
                     role: "user",
@@ -289,8 +296,10 @@ export const generateQuizFromImage = async (imageBase64: string): Promise<any[]>
             },
         } as any);
 
-        const text = (result as any).candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) throw new Error("No quiz generated from image.");
+        const textRaw = (result as any).candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!textRaw) throw new Error("No quiz generated from image.");
+
+        const text = textRaw.replace(/```json/g, '').replace(/```/g, '').trim();
         return JSON.parse(text);
 
     } catch (error) {

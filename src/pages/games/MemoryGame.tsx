@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 const congratulations = '/congratulations.png';
 
-const EMOJIS = ['🍎', '🐶', '🍕', '🚗', '🎈']; // 5 pairs for 5 rounds
+const EMOJIS = ['🍎', '🐶', '🍕', '🚗', '🎈', '🦄', '🏀', '🎸', '🍦', '🏝️']; // Expanded for more difficulty
 
 interface Card {
     id: number;
@@ -16,13 +16,18 @@ const MemoryGame: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { avatarId } = (location.state as { avatarId?: string }) || {};
-    const { score, maxRounds, isGameOver, recordSuccess, claimReward } = useGameSession(5, avatarId); // 5 Pairs = 5 Points = Game Over
+    // Game State
+    const [round, setRound] = useState(1);
+    const [difficulty, setDifficulty] = useState(4); // Start with 4 pairs
+    const { score, maxRounds, isGameOver, recordSuccess, claimReward } = useGameSession(3, avatarId); // 3 Rounds Total
+
     const [cards, setCards] = useState<Card[]>([]);
     const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
-    // const [score, setScore] = useState(0);
+    const [matchesFound, setMatchesFound] = useState(0);
 
-    const initGame = () => {
-        const doubled = [...EMOJIS, ...EMOJIS]
+    const initRound = (numPairs: number) => {
+        const selectedEmojis = EMOJIS.slice(0, numPairs);
+        const doubled = [...selectedEmojis, ...selectedEmojis]
             .sort(() => Math.random() - 0.5)
             .map((emoji, idx) => ({
                 id: idx,
@@ -32,12 +37,16 @@ const MemoryGame: React.FC = () => {
             }));
         setCards(doubled);
         setFlippedIndices([]);
-        // setScore(0);
+        setMatchesFound(0);
     };
 
     useEffect(() => {
-        initGame();
-    }, []);
+        // Round 1: 4 pairs (8 cards)
+        // Round 2: 5 pairs (10 cards) - if you want more, add more emojis
+        // Round 3: 6 pairs (12 cards) - need enough emojis
+        // Current EMOJIS has 5. Let's add more emojis to support higher difficulty.
+        initRound(difficulty);
+    }, [round, difficulty]); // Re-init when round/difficulty changes
 
     const handleFlip = (idx: number) => {
         if (flippedIndices.length === 2 || cards[idx].isFlipped || cards[idx].isMatched) return;
@@ -58,10 +67,20 @@ const MemoryGame: React.FC = () => {
                     matchedCards[second].isMatched = true;
                     setCards(matchedCards);
                     setFlippedIndices([]);
-                    recordSuccess();
-                    if (matchedCards.every(c => c.isMatched)) {
-                        alert('You found them all! 🎉');
-                        // initGame(); // Don't auto-restart, let Game Over screen handle
+
+                    const newMatches = matchesFound + 1;
+                    setMatchesFound(newMatches);
+
+                    if (newMatches === difficulty) {
+                        // Round Complete
+                        recordSuccess();
+
+                        if (round < 3) {
+                            setTimeout(() => {
+                                setRound(r => r + 1);
+                                setDifficulty(d => d + 1); // Increase pairs by 1
+                            }, 1000);
+                        }
                     }
                 }, 500);
             } else {
@@ -127,15 +146,15 @@ const MemoryGame: React.FC = () => {
                     <button className="clay-button secondary" onClick={() => navigate('/game-hub', { state: { avatarId } })}
                         style={{ padding: '8px 12px', fontSize: '0.8rem' }}>← BACK</button>
                     <h2 style={{ fontSize: 'clamp(1.2rem, 5vw, 1.8rem)', margin: 0, flex: 1, textAlign: 'center', fontWeight: 900, color: '#FF758F' }}>MEMORY MATCH</h2>
-                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#666' }}>Pairs {score}/{maxRounds}</div>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#666' }}>Round {score + 1}/{maxRounds}</div>
                 </div>
 
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', margin: '10px 0' }}>
                     <div className="cards-grid" style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
+                        gridTemplateColumns: `repeat(${difficulty <= 4 ? 4 : (difficulty <= 6 ? 4 : 5)}, 1fr)`,
                         gap: 'clamp(6px, 1.5vw, 12px)',
-                        width: 'min(90vw, 55vh)',
+                        width: 'min(95vw, 60vh)',
                         margin: '0 auto'
                     }}>
                         {cards.map((card, idx) => (
@@ -164,11 +183,6 @@ const MemoryGame: React.FC = () => {
                     </div>
                 </div>
 
-                <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                    <button className="clay-button secondary" style={{ fontSize: '0.8rem', padding: '8px 20px' }} onClick={initGame}>
-                        RESTART BOARD 🔄
-                    </button>
-                </div>
             </div>
         </div>
     );

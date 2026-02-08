@@ -188,7 +188,6 @@ const GameHub: React.FC = () => {
                                 margin: 0,
                                 fontWeight: 700
                             }}>{cat.title}</h2>
-                            <span style={{ fontSize: '0.9rem', color: '#b2bec3' }}>More</span>
                         </div>
 
                         <div style={{

@@ -700,10 +700,11 @@ const SelectAvatar: React.FC = () => {
             )}
 
             {/* DEBUG: Temporary Demo Button */}
+            {/*
             <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999 }}>
                 <button
                     onClick={() => {
-                        const targetId = "533xskuid";
+                        const targetId = "t24d3zu7n";
                         const now = Date.now();
                         // Mock ID if needed, or update current
                         let targetAvatar = getAvatarById(targetId) || {
@@ -739,7 +740,7 @@ const SelectAvatar: React.FC = () => {
                 >
                     💀 Kill 533x
                 </button>
-            </div>
+            </div>*/}
         </div>
     );
 };

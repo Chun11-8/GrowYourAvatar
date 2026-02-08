@@ -162,16 +162,27 @@ const Counting: React.FC = () => {
                 <p style={{ fontWeight: 800, color: '#666', marginBottom: '2rem' }}>{message}</p>
 
                 <div className="options-grid" style={{
-                    display: 'flex',
-                    justifyContent: 'center',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
                     gap: '1.5rem',
-                    flexWrap: 'wrap'
+                    width: '100%',
+                    maxWidth: '400px',
+                    margin: '0 auto'
                 }}>
                     {options.map((num, idx) => (
                         <button
                             key={idx}
                             className="clay-button"
-                            style={{ background: 'white', fontSize: '2.5rem', minWidth: '80px' }}
+                            style={{
+                                background: 'white',
+                                fontSize: 'clamp(2rem, 5vw, 3rem)',
+                                aspectRatio: '1/1',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#333', // Ensure text is visible
+                                width: '100%'
+                            }}
                             onClick={() => handleSelect(num)}
                         >
                             {num}

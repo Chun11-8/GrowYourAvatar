@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useGameSession } from '../../hooks/useGameSession';
 const congratulations = '/congratulations.png';
@@ -36,6 +36,9 @@ const ConnectThree: React.FC = () => {
 
     const drop = (c: number) => {
         if (winner || isGameOver) return;
+        // Check if column is full
+        if (board[0][c]) return;
+
         const newBoard = board.map(row => [...row]);
         for (let r = ROWS - 1; r >= 0; r--) {
             if (!newBoard[r][c]) {
@@ -55,6 +58,68 @@ const ConnectThree: React.FC = () => {
             }
         }
     };
+
+    // CPU Logic
+    useEffect(() => {
+        if (!isRedNext && !winner && !isGameOver) {
+            const timer = setTimeout(() => {
+                // Simple AI
+                const validCols = [];
+                for (let c = 0; c < COLS; c++) {
+                    if (!board[0][c]) validCols.push(c);
+                }
+
+                if (validCols.length === 0) return;
+
+                // 1. Try to win or block (simplified random for now to keep it fun for kids)
+                // A better AI would check for 3-in-a-rows, but for 3-8yo, random valid is often enough, 
+                // or just slight bias towards center.
+
+                // Let's optimize slightly: if can win, do it. If opponent can win, block it.
+                // Helper to simulate drop
+                const simulateDrop = (b: (string | null)[][], col: number, player: string) => {
+                    const temp = b.map(row => [...row]);
+                    for (let r = ROWS - 1; r >= 0; r--) {
+                        if (!temp[r][col]) {
+                            temp[r][col] = player;
+                            return temp;
+                        }
+                    }
+                    return null;
+                };
+
+                let chosenCol = -1;
+
+                // Check for win
+                for (const col of validCols) {
+                    const nextBoard = simulateDrop(board, col, '🟡');
+                    if (nextBoard && checkWin(nextBoard) === '🟡') {
+                        chosenCol = col;
+                        break;
+                    }
+                }
+
+                // Check for block
+                if (chosenCol === -1) {
+                    for (const col of validCols) {
+                        const nextBoard = simulateDrop(board, col, '🔴');
+                        if (nextBoard && checkWin(nextBoard) === '🔴') {
+                            chosenCol = col;
+                            break;
+                        }
+                    }
+                }
+
+                // Random
+                if (chosenCol === -1) {
+                    chosenCol = validCols[Math.floor(Math.random() * validCols.length)];
+                }
+
+                drop(chosenCol);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [isRedNext, winner, isGameOver, board]);
 
     const handleNextRound = () => {
         setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(null)));
@@ -117,7 +182,7 @@ const ConnectThree: React.FC = () => {
                 </div>
 
                 <div style={{ flexShrink: 0, textAlign: 'center', fontSize: '1.2rem', fontWeight: 800, color: '#333', marginBottom: '5px' }}>
-                    {winner ? `Winner: ${winner}! 🎉` : `Turn: ${isRedNext ? '🔴' : '🟡'}`}
+                    {winner ? (winner === '🔴' ? "You Win! 🎉" : "Computer Wins! 🤖") : (isRedNext ? "Your Turn (🔴)" : "Computer thinking... 🟡")}
                 </div>
 
                 <div style={{
