@@ -26,7 +26,7 @@ The platform uniquely integrates **Google's Gemini AI 3** to allow for infinite 
 ## ✨ Key Features
 
 ### 1. 🦸‍♂️ Interactive Avatar System
--   **Customization**: Kids can design their avatar with unique hairstyles, outfits, and colors.
+-   **Customization**: Kids can upload their favorite photo and generate a voxel avatar using Gemini 3
 -   **Evolution Mechanic**: The avatar has three growth stages (Baby -> Kid -> Adult). Growth is triggered by accumulated XP from learning activities.
 -   **Status Management**: Players must manage their avatar's Hunger and Health, teaching responsibility alongside academics.
 
