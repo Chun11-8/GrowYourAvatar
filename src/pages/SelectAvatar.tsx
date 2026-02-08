@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getAllAvatars, deleteAvatar, getAvatarById, saveAvatar, createInitialStats, getInitialGrowthStats, type AvatarData } from '../utils/storage';
+import { getAllAvatars, deleteAvatar, type AvatarData } from '../utils/storage';
 
 interface DeathAlertData {
     name: string;
